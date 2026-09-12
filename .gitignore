@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.npm-cache/
+test-results/
+playwright-report/
+*.log
+.env
+.env.*
+!.env.example
+# Copie sorgente locali: la versione usata dall'app è in public/people/models/.
+assets/people/originals/
+.DS_Store
+Thumbs.db

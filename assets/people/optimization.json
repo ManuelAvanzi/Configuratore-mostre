@@ -1,0 +1,38 @@
+[
+  {
+    "file": "person-business.glb",
+    "originalBytes": 24949592,
+    "browserBytes": 12315136,
+    "textureMax": 1024
+  },
+  {
+    "file": "person-casual-15.glb",
+    "originalBytes": 24679496,
+    "browserBytes": 11914684,
+    "textureMax": 1024
+  },
+  {
+    "file": "person-casual-35.glb",
+    "originalBytes": 26649200,
+    "browserBytes": 12729988,
+    "textureMax": 1024
+  },
+  {
+    "file": "person-grey-blazer.glb",
+    "originalBytes": 22190432,
+    "browserBytes": 9907876,
+    "textureMax": 1024
+  },
+  {
+    "file": "person-mint.glb",
+    "originalBytes": 27007308,
+    "browserBytes": 14095052,
+    "textureMax": 1024
+  },
+  {
+    "file": "person-sophia.glb",
+    "originalBytes": 36738536,
+    "browserBytes": 8688184,
+    "textureMax": 1024
+  }
+]

@@ -1,0 +1,11 @@
+import http from 'node:http';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {execFile} from 'node:child_process';
+const root=path.join(path.dirname(fileURLToPath(import.meta.url)),'dist');
+const types={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.woff2':'font/woff2','.png':'image/png','.json':'application/json'};
+const port=4173;
+const server=http.createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost');const route=['/','/studio','/studio/'].includes(url.pathname)?'/index.html':url.pathname;const target=path.resolve(root,'.'+decodeURIComponent(route));if(!target.startsWith(root+path.sep)){res.writeHead(403);res.end();return;}const data=await fs.readFile(target);res.writeHead(200,{'Content-Type':types[path.extname(target)]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':'no-cache'});res.end(data);}catch{res.writeHead(404);res.end('File non trovato');}});
+server.on('error',e=>{console.error(e.code==='EADDRINUSE'?'La porta 4173 è già occupata. Chiudi l’altra istanza di Spazio e riprova.':e.message);process.exitCode=1;});
+server.listen(port,'127.0.0.1',()=>{console.log(`Spazio è pronto: http://localhost:${port}\nLascia aperta questa finestra. Ctrl+C per chiudere.`);if(process.argv.includes('--open'))execFile('cmd',['/c','start','','http://localhost:'+port]);});

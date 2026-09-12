@@ -1,0 +1,3 @@
+import {chromium} from '@playwright/test';
+const browser=await chromium.launch({channel:'msedge',headless:true});const page=await browser.newPage({viewport:{width:1600,height:1000}});
+await page.goto('http://localhost:4173/studio?start=demo');await page.locator('#scene canvas').waitFor();await page.waitForTimeout(900);await page.screenshot({path:'public/studio-preview.png'});await page.locator('.stage-heading,.floating-tools,.stage-bottom').evaluateAll(els=>els.forEach(el=>el.style.visibility='hidden'));await page.locator('#scene').screenshot({path:'public/space-preview.png'});await browser.close();

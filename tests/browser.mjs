@@ -1,0 +1,26 @@
+import {chromium} from '@playwright/test';
+import fs from 'node:fs/promises';
+await fs.mkdir('test-results',{recursive:true});
+const browser=await chromium.launch({channel:'msedge',headless:true,args:['--enable-webgl','--ignore-gpu-blocklist']});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://localhost:5173/studio');await page.locator('#dialog[open]').waitFor();
+await page.screenshot({path:'test-results/welcome.png'});
+await page.locator('[data-action="demo"]').click();await page.waitForTimeout(1500);await page.screenshot({path:'test-results/editor.png'});
+await page.locator('[data-add="art"]').click();await page.locator('[data-field="w"]').fill('1.2');await page.locator('[data-field="w"]').press('Tab');
+await page.locator('[data-field="h"]').fill('0.8');await page.locator('[data-field="h"]').press('Tab');
+if(!await page.locator('.measurement-note').textContent().then(s=>s.includes('120 × 80')))throw Error('Misure opera non coerenti');
+await page.locator('[data-action="duplicate"]').click();await page.locator('[data-action="delete"]').click();await page.locator('[data-action="undo"]').click();
+await page.locator('.step[data-mode="space"]').click();await page.locator('[data-action="wall-numeric"]').click();
+await page.locator('[data-field="wall.bx"]').fill('3');await page.locator('[data-field="wall.bx"]').press('Tab');
+await page.screenshot({path:'test-results/plan.png'});
+await page.locator('.step[data-mode="layout"]').click();await page.locator('.top-actions [data-action="visit"]').click();
+await page.keyboard.down('KeyW');await page.waitForTimeout(350);await page.keyboard.up('KeyW');await page.screenshot({path:'test-results/visit.png'});
+await page.locator('[data-action="vr"]').click();await page.locator('#toast.show').waitFor();await page.keyboard.press('Escape');
+await page.locator('.top-actions [data-action="export"]').click();const dlPromise=page.waitForEvent('download');await page.locator('[data-action="save-json"]').click();const dl=await dlPromise;await dl.saveAs('test-results/project.spazio.json');
+const data=JSON.parse(await fs.readFile('test-results/project.spazio.json','utf8'));if(data.objects.length<10)throw Error('Esportazione incompleta');
+await page.locator('[data-action="close"]').click();await page.waitForTimeout(600);await page.reload();await page.locator('[data-action="resume"]:visible').waitFor();await page.locator('[data-action="resume"]').click();
+await page.setViewportSize({width:390,height:844});await page.waitForTimeout(500);await page.screenshot({path:'test-results/mobile.png',fullPage:true});
+if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Overflow mobile');
+await fs.writeFile('test-results/browser-results.json',JSON.stringify({errors,objects:data.objects.length,walls:data.walls.length,checks:['demo','dimensioni','duplica/elimina/annulla','parete numerica','visita','fallback VR','esportazione JSON','persistenza','mobile']},null,2));
+await browser.close();if(errors.length)throw Error(errors.join('\n'));console.log('Browser: tutti i controlli superati.');
+
