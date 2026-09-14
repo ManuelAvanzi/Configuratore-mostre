@@ -1,4 +1,5 @@
 import {peopleCatalog,legacyPeople,migratePerson} from './people-catalog.js';
+import {validateSurface,FLOOR_ID,surfaceObjects} from './surfaces.js';
 export const uid=()=>crypto.randomUUID();
 export const clone=x=>structuredClone(x);
 export const round=x=>Math.round(x*100)/100;
@@ -36,7 +37,10 @@ export function wallParts(w){const len=wallLength(w),out=[];let at=0;for(const o
 export function openingFits(w,o,exclude){return o.offset>=0&&o.width>=.2&&o.offset+o.width<=wallLength(w)+.001&&o.sill>=0&&o.height>=.2&&o.sill+o.height<=w.height+.001&&!w.openings.some(a=>a.id!==exclude&&o.offset<a.offset+a.width&&o.offset+o.width>a.offset);}
 export function validate(p){const n=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max; if(!p||p.version!==1||typeof p.name!=='string'||!n(p.width,2,100)||!n(p.depth,2,100)||!n(p.height,2,12)||!Array.isArray(p.walls)||!Array.isArray(p.objects)||p.walls.length>500||p.objects.length>500)throw Error('Il file non è un progetto Spazio valido.');
  if(typeof p.id!=='string'||typeof p.floor!=='string'||!/^#[0-9a-f]{6}$/i.test(p.floor)||p.name.length>200)throw Error('Proprietà progetto non valide.');
- const ids=new Set();const id=x=>{if(typeof x!=='string'||ids.has(x))throw Error('Identificatori non validi.');ids.add(x)};
+ validateSurface(p.floorSurface);
+ for(const w of p.walls){if(w.surfaces!==undefined){if(!w.surfaces||typeof w.surfaces!=='object'||Array.isArray(w.surfaces))throw Error('Finiture parete non valide.');validateSurface(w.surfaces.a);validateSurface(w.surfaces.b);}}
+ for(const o of p.objects){validateSurface(o.surface);if(o.surface&&!surfaceObjects.includes(o.type))throw Error('Questo elemento mantiene i propri materiali originali.');}
+ const ids=new Set();const id=x=>{if(typeof x!=='string'||x===FLOOR_ID||ids.has(x))throw Error('Identificatori non validi.');ids.add(x)};
  if(p.measurements!==undefined){if(!Array.isArray(p.measurements)||p.measurements.length>200)throw Error('Massimo 200 quote per progetto.');for(const m of p.measurements){if(!m||!['ax','az','bx','bz'].every(k=>n(m[k],-100,100))||Math.hypot(m.bx-m.ax,m.bz-m.az)<.1)throw Error('Quota non valida: indica due punti distanti almeno 10 cm.');id(m.id);}}
  for(const w of p.walls){id(w.id);if(!['ax','az','bx','bz'].every(k=>n(w[k],-100,100))||!n(w.height,.2,12)||!n(w.thickness,.03,2)||wallLength(w)<.1||!Array.isArray(w.openings))throw Error('Parete non valida.');for(const o of w.openings){id(o.id);if(!['door','window','opening'].includes(o.type)||!['offset','width','height','sill'].every(k=>n(o[k],0,200))||!openingFits(w,o,o.id))throw Error('Aperture sovrapposte o fuori parete.');}}
  for(const o of p.objects){id(o.id);if(![...catalog.map(c=>c.type),...Object.keys(legacyPeople),'model'].includes(o.type)||typeof o.name!=='string'||!['w','h','d'].every(k=>n(o[k],.01,100))||!['x','z','y','rotation'].every(k=>n(o[k],-360,360))||typeof o.color!=='string'||!/^#[0-9a-f]{6}$/i.test(o.color))throw Error('Elemento non valido.');for(const k of ['image','video','model'])if(o[k]&&!(typeof o[k]==='string'&&o[k].startsWith('data:')))throw Error('Asset esterno non consentito.');migratePerson(o);}

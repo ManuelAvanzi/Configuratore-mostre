@@ -48,6 +48,18 @@ Per lo sviluppo: `npm run dev`. Per aggiornare la versione avviata da AVVIA.cmd:
 - **Controlli geometrici**: segnalano elementi fuori dal pavimento, quote fuori ambiente, intersezioni con le parti solide delle pareti e sovrapposizioni tra ingombri orientati. Rispettano porte/finestre e appoggi verticali. Un clic sulla segnalazione seleziona l’elemento; sono mostrate al massimo 100 segnalazioni. I volumi rettangolari sono approssimazioni, soprattutto per sculture e persone: valutare gli accostamenti intenzionali. Non verificano passaggi minimi, accessibilità o conformità normativa.
 - La scheda HTML esportata raccoglie pianta, lista elementi, quote e controlli al momento dell’esportazione. Le misure stampate sono arrotondate al centimetro.
 
+### Materiali e colori
+
+Clicca il pavimento o una parete nel 3D, oppure usa **Pavimento** e il menu **Pareti** sopra il catalogo. Il pannello **Materiale e colore** comprende tinta unita, intonaco, parquet rovere, cemento, resina, moquette, pietra e metallo. Colore personalizzabile tramite selettore, codice HEX e palette che raccoglie anche i colori già usati nel progetto; finitura opaca, satinata o lucida.
+
+Ogni parete ha **lato A e lato B** indipendenti. Il clic su una faccia seleziona il lato corrispondente. I comandi **Usa su entrambi i lati** e **Usa su tutte le pareti · A e B** copiano la finitura corrente e possono essere annullati. Una parete selezionata resta visibile anche in sezione.
+
+Le texture sono campioni procedurali locali, senza download esterni. Modulo e direzione sono impostabili in metri e gradi; il parquet ha doghe sfalsate con lunghezza pari a sei volte la larghezza. La trama mantiene la scala dopo il ridimensionamento e prosegue attraverso le porzioni di parete separate dalle aperture. Le finiture non sono campioni certificati di produttori né una riproduzione colorimetrica del materiale reale.
+
+Materiali disponibili anche per sedute, desk, piedistalli, pareti temporanee, strutture espositive ed elementi scenografici. Persone e GLB importati mantengono i materiali incorporati; immagini e video mantengono i propri contenuti. Il pulsante **Griglia** permette di nascondere la griglia 3D durante la valutazione delle finiture.
+
+Le impostazioni sono incluse nel salvataggio locale, nel file JSON e nella tabella **Materiali e finiture** della scheda HTML esportata. I progetti precedenti restano compatibili: conservano il colore del pavimento e le pareti uniformi finché non viene scelta una finitura.
+
 ### Persone come riferimento di scala
 
 Nella categoria **Persone** trovi i sei GLB forniti dall’utente: Camicia azzurra, Camicia verde, Camicia blu, Blazer grigio, Top menta e Completo beige. Le vecchie miniature procedurali sono state rimosse. Tutti i modelli mantengono posa statica e materiali originali; non è applicata una tinta globale agli abiti e alla pelle.

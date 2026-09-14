@@ -47,3 +47,14 @@ I test del modello sono ora 9: comprendono normalizzazione uniforme, appoggio a 
 - `npm run build`: compilazione completata. Rimane l’avviso dimensione bundle del motore 3D; nessun errore di compilazione.
 
 Schermate: `test-results/studio-professional.png`, `studio-measurements.png`, `studio-mobile.png`. Quote statiche, ingombri rettangolari e controlli non normativi: dettagli nel README.
+
+## Materiali e superfici — 14 settembre 2026
+
+- `npm test`: 17 test superati, inclusi compatibilità dei progetti precedenti, due lati indipendenti, validazione delle finiture e continuità delle coordinate texture in metri attraverso le porzioni delle pareti.
+- `node tests/surfaces.mjs`: selezione con clic reale del pavimento e di una parete nel 3D, materiali, colore HEX, finitura, scala/direzione, copia su tutte le pareti, undo/redo, materiale di una seduta, esportazioni JSON/HTML, ripresa e rifiuto di una scala invalida. Verifica desktop e mobile senza overflow ed errori JavaScript.
+- `node tests/precision.mjs`: regressione dei flussi quote, trascinamento, annullamento, controlli, ridimensionamento, esportazione e ripresa superata.
+- Schermate in `test-results/materials-floor.png`, `materials-wall.png` e `materials-mobile.png`.
+- `node tests/people-glb.mjs`: tutti i sei GLB superano caricamento, cache, ridimensionamento, duplicazione, esportazione, visita e mobile anche con il nuovo sistema di materiali.
+- `npm run build`: build aggiornata completata; resta l'avviso già presente sulla dimensione del bundle 3D.
+
+Le finiture sono campioni procedurali indicativi. Resa verificata in Chrome; non eseguita una verifica colorimetrica o fotometrica fisica.

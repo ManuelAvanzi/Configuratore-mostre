@@ -4,6 +4,12 @@ import {createProject,demo,item,validate,wallParts,openingFits,canWalk} from '..
 import {Box3,Vector3,Group,Mesh,BoxGeometry,MeshBasicMaterial} from 'three';
 import {fitPerson} from '../src/people-loader.js';
 import {peopleCatalog,sizePerson} from '../src/people-catalog.js';
+import {surface,preset,surfaceRows,validateSurface,FLOOR_ID} from '../src/surfaces.js';
+import {surfaceUV} from '../src/surface-renderer.js';
+
+test('vecchi progetti mantengono colore pavimento e pareti senza migrazioni distruttive',()=>{const p=createProject();p.floor='#ab1234';validate(p);assert.equal(surface(p.floorSurface,p.floor).color,'#ab1234');assert.equal(surfaceRows(p).length,9);assert.equal(surfaceRows(p)[1].material,'paint');assert.equal(p.floorSurface,undefined);});
+test('materiali: facce indipendenti, scala e finitura conservate nel JSON',()=>{const p=createProject();p.floorSurface=preset('oak');p.walls[0].surfaces={a:preset('concrete'),b:preset('plaster')};const copy=validate(JSON.parse(JSON.stringify(p)));assert.equal(copy.floorSurface.scale,.2);assert.equal(copy.walls[0].surfaces.a.material,'concrete');assert.equal(copy.walls[0].surfaces.b.material,'plaster');for(const change of [{scale:0},{scale:Infinity},{rotation:NaN},{material:'url'},{color:'red'},{finish:'unknown'}])assert.throws(()=>validateSurface({...preset('oak'),...change}),/Materiale non valido/);p.objects=[{...item('bench'),id:FLOOR_ID}];assert.throws(()=>validate(p),/Identificatori/);});
+test('UV in metri: la trama attraversa le porzioni della parete senza ripartire',()=>{const first=new BoxGeometry(2,3,.2),second=new BoxGeometry(2,3,.2);surfaceUV(first,{x:1,y:1.5,z:0});surfaceUV(second,{x:3,y:1.5,z:0});const edgeUV=(g,localX)=>{const out=[];for(let i=0;i<g.attributes.position.count;i++)if(g.attributes.normal.getZ(i)===1&&g.attributes.position.getX(i)===localX)out.push(g.attributes.uv.getX(i));return out;};assert.deepEqual(edgeUV(first,1),[2,2]);assert.deepEqual(edgeUV(second,-1),[2,2]);first.dispose();second.dispose();});
 import {footprint,containsPoint,volumesOverlap,projectChecks,resizeRoom,setWallLength,measurementSVG} from '../src/planning.js';
 
 test('ingombri ruotati: selezione e intersezioni usano la stessa orientazione del 3D',()=>{const a={...item('bench'),w:4,d:.2,rotation:45};const b={...a,z:.5};assert.equal(volumesOverlap(a,b),false);assert.equal(containsPoint(a,1,-1),true);assert.equal(containsPoint(a,1,1),false);assert.ok(footprint(a).some(p=>p.x>1.4&&p.z<0));b.z=.1;assert.equal(volumesOverlap(a,b),true);});
