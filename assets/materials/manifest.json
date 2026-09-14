@@ -1,0 +1,290 @@
+[
+  {
+    "id": "Bricks097",
+    "source": "https://ambientcg.com/a/Bricks097",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Bricks097_2K-JPG.zip",
+    "sha256": "0c4ea4f9ba8373ba9a6f12b0f92a2b1859686e8c670f44616b38be095f65b71f",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Concrete031",
+    "source": "https://ambientcg.com/a/Concrete031",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Concrete031_2K-JPG.zip",
+    "sha256": "a346866352d749ff36a298d2d8d783354ba80be4a03b7bf0370d92c89c5d7e56",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Concrete034",
+    "source": "https://ambientcg.com/a/Concrete034",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Concrete034_2K-JPG.zip",
+    "sha256": "fafd7cd3aee2b703abbb12b7810ef565ab76ac7ea3b1ea9a73b088e423e670b3",
+    "sourceDimensionsCm": [
+      110,
+      55
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Fabric019",
+    "source": "https://ambientcg.com/a/Fabric019",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Fabric019_2K-JPG.zip",
+    "sha256": "ff8419fc6a304ee26ffd9d3e4245d58b36ad83afbfebdfb43f5d857889d635ec",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Fabric030",
+    "source": "https://ambientcg.com/a/Fabric030",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Fabric030_2K-JPG.zip",
+    "sha256": "7fc77fde6203911713a2fa41fa54f41f400c2670f7f7a3f4d57567dfdbf733e8",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Marble006",
+    "source": "https://ambientcg.com/a/Marble006",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Marble006_2K-JPG.zip",
+    "sha256": "2a01b2068f8f5e05c4afcd964e3a7648b4b731e4e0b1c59c6f98e8421d729949",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Marble012",
+    "source": "https://ambientcg.com/a/Marble012",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Marble012_2K-JPG.zip",
+    "sha256": "585c73d1e2dc8747074ef4fa4027795e3556fbe0fa43362c90c90b633f6956db",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Metal007",
+    "source": "https://ambientcg.com/a/Metal007",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Metal007_2K-JPG.zip",
+    "sha256": "172d573a1c4ca919ae52cc83f015194ea829e8fa209d72e4b011ae6a26615d22",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Metal032",
+    "source": "https://ambientcg.com/a/Metal032",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Metal032_2K-JPG.zip",
+    "sha256": "4b8884843c490963d5734be036c35639d064e7a817eb61145322f69c6c19895a",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "PaintedPlaster017",
+    "source": "https://ambientcg.com/a/PaintedPlaster017",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=PaintedPlaster017_2K-JPG.zip",
+    "sha256": "a61330b10b1aa58410f8b60632f667e7a6d84d521bbd85cec4c4de7136d282d2",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Plaster001",
+    "source": "https://ambientcg.com/a/Plaster001",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Plaster001_2K-JPG.zip",
+    "sha256": "9894765632cfa0feb3349b581825a9c224dee9efa1cebb8aba63bd1c7bc9fc3c",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Terrazzo001",
+    "source": "https://ambientcg.com/a/Terrazzo001",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Terrazzo001_2K-JPG.zip",
+    "sha256": "b5f07e28db0ce9d9460977d7495741b093c63011a7cc059e3b1863123f0504e0",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Tiles093",
+    "source": "https://ambientcg.com/a/Tiles093",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Tiles093_2K-JPG.zip",
+    "sha256": "e3105c01621c93f819b25b2cb16261d4a17dfbc525767b0207ed3a427a01aa9c",
+    "sourceDimensionsCm": [
+      245,
+      245
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Tiles107",
+    "source": "https://ambientcg.com/a/Tiles107",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Tiles107_2K-JPG.zip",
+    "sha256": "fa76887bb33af0972154700126d1f86d01eaed518341ce7411616c1d1202ac55",
+    "sourceDimensionsCm": [
+      100,
+      100
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "Wood051",
+    "source": "https://ambientcg.com/a/Wood051",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=Wood051_2K-JPG.zip",
+    "sha256": "ef50cd051a1d998bf2a03e243e991474415d948af6d4b76d291c937654c97d4b",
+    "sourceDimensionsCm": [
+      80,
+      80
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "WoodFloor043",
+    "source": "https://ambientcg.com/a/WoodFloor043",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=WoodFloor043_2K-JPG.zip",
+    "sha256": "5f9cab5c67eeeb441a6aa6744f9ebbd56186dfeab4f9c1d924220d3d43b73bdb",
+    "sourceDimensionsCm": [
+      130,
+      65
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "WoodFloor051",
+    "source": "https://ambientcg.com/a/WoodFloor051",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=WoodFloor051_2K-JPG.zip",
+    "sha256": "eb7d1cee763bb17a59feb89b0fd16398d3673a071a76fed289111cf81013ac25",
+    "sourceDimensionsCm": [
+      180,
+      180
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  },
+  {
+    "id": "WoodFloor064",
+    "source": "https://ambientcg.com/a/WoodFloor064",
+    "license": "CC0-1.0",
+    "download": "https://ambientcg.com/get?file=WoodFloor064_2K-JPG.zip",
+    "sha256": "c14c4b90743232f245afe85abad470613680877dcf7197b80b550f27d9f62d8c",
+    "sourceDimensionsCm": [
+      0,
+      0
+    ],
+    "maps": {
+      "color": 2048,
+      "normal": 1024,
+      "roughness": 1024
+    }
+  }
+]

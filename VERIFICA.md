@@ -58,3 +58,13 @@ Schermate: `test-results/studio-professional.png`, `studio-measurements.png`, `s
 - `npm run build`: build aggiornata completata; resta l'avviso già presente sulla dimensione del bundle 3D.
 
 Le finiture sono campioni procedurali indicativi. Resa verificata in Chrome; non eseguita una verifica colorimetrica o fotometrica fisica.
+
+## Libreria HD — 14 settembre 2026
+
+La precedente libreria procedurale è sostituita da 20 materiali: 18 set PBR ambientCG CC0 e 2 finiture uniformi. Mappe colore 2K, normali OpenGL e rugosità 1K; anteprime tratte dalle texture reali. Asset locali circa 46,4 MiB, ZIP sorgente esclusi da Git.
+
+`node tests/material-quality.mjs` verifica le dimensioni fisiche dei file con Sharp e carica tutti i 18 set nel browser. Verificati filtro per categoria, cambio dei materiali, applicazione a più pareti e modifica tinta senza ricaricare le mappe dello stesso set, visita e mobile. Nessun errore JavaScript o risorsa mancante. `node tests/surfaces.mjs` verifica anche salvataggio, esportazioni, lati delle pareti e annulla/ripristina con il nuovo catalogo.
+
+La conversione del vecchio parametro del parquet al modulo texture viene verificata come operazione non distruttiva e non cumulativa. Schermate: `test-results/materials-hd-editor.png`, `materials-hd-marble.png`, `materials-hd-visit.png`, `materials-hd-mobile.png`.
+
+Verifica finale: 18 test unitari superati e build completata. L'illuminazione è stata ridotta per preservare il contrasto delle texture; la resa è stata ricontrollata in editor e visita. Rimane l'avviso sulla dimensione del bundle 3D.

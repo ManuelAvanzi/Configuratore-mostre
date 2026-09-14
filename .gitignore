@@ -9,5 +9,7 @@ playwright-report/
 !.env.example
 # Copie sorgente locali: la versione usata dall'app è in public/people/models/.
 assets/people/originals/
+assets/materials/downloads/
+assets/materials/contact-sheet.png
 .DS_Store
 Thumbs.db
