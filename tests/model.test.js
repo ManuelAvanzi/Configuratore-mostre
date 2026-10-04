@@ -6,6 +6,18 @@ import {fitPerson} from '../src/people-loader.js';
 import {peopleCatalog,sizePerson} from '../src/people-catalog.js';
 import {surface,preset,surfaceRows,validateSurface,FLOOR_ID} from '../src/surfaces.js';
 import {surfaceUV} from '../src/surface-renderer.js';
+
+test('fari: impostazioni persistenti, spegnimento e limiti di importazione',()=>{
+ const p=createProject();p.lighting={ambient:.4,daylight:.1,environment:.2};
+ p.objects=[{...item('light'),intensity:0,beamAngle:75,tilt:60}];
+ const copy=validate(JSON.parse(JSON.stringify(p)));
+ assert.equal(copy.objects[0].intensity,0);assert.equal(copy.objects[0].tilt,60);
+ for(const invalid of [{intensity:-1},{intensity:Infinity},{tilt:91},{beamAngle:0}]){
+  const bad=structuredClone(p);Object.assign(bad.objects[0],invalid);assert.throws(()=>validate(bad),/faro/);
+ }
+ const legacy=createProject();legacy.objects=[{...item('light'),beamAngle:undefined,tilt:undefined}];assert.doesNotThrow(()=>validate(legacy));
+ p.lighting.ambient=-1;assert.throws(()=>validate(p),/Illuminazione/);
+});
 test('conversione vecchio parquet al modulo PBR una sola volta',()=>{const legacy={material:'oak',color:'#bd9364',scale:.2,finish:'satin',rotation:90};const upgraded=surface(legacy);assert.equal(upgraded.scale,1.8);assert.equal(upgraded.color,legacy.color);assert.equal(upgraded.rotation,90);assert.deepEqual(surface(upgraded),upgraded);assert.equal(legacy.scale,.2);});
 
 test('vecchi progetti mantengono colore pavimento e pareti senza migrazioni distruttive',()=>{const p=createProject();p.floor='#ab1234';validate(p);assert.equal(surface(p.floorSurface,p.floor).color,'#ab1234');assert.equal(surfaceRows(p).length,9);assert.equal(surfaceRows(p)[1].material,'paint');assert.equal(p.floorSurface,undefined);});

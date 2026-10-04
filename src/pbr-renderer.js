@@ -21,7 +21,7 @@ export function endSurfaceBuild(){
 }
 export function surfaceMaterial(value,color){
  const s=surface(value,color),def=materials.find(m=>m.id===s.material),key=JSON.stringify(s);used.add(key);if(pool.has(key))return pool.get(key);
- const m=new T.MeshStandardMaterial({color:s.color,roughness:{matte:1,satin:.65,gloss:.24}[s.finish],metalness:def.metalness||0,normalScale:new T.Vector2(.7,.7)});
+ const m=new T.MeshStandardMaterial({color:s.color,roughness:{matte:1,satin:.65,gloss:.24}[s.finish],metalness:def.metalness||0,normalScale:new T.Vector2(.35,.35)});
  m.userData.surfaceManaged=true;m.userData.asset=def.asset;pool.set(key,m);
  if(def.asset)loadSet(def.asset).then(textures=>{if(pool.get(key)!==m)return;const [map,normalMap,roughnessMap]=textures.map(base=>{const texture=base.clone();texture.repeat.set(1/s.scale,1/(s.scale*(def.aspect||1)));texture.rotation=s.rotation*Math.PI/180;texture.needsUpdate=true;return texture;});Object.assign(m,{map,normalMap,roughnessMap});m.needsUpdate=true;}).catch(()=>{});
  return m;

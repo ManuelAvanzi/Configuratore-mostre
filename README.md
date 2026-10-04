@@ -19,7 +19,7 @@ La repository include i sei GLB ottimizzati usati dall'app. Le copie originali i
 
 ## Homepage e accesso
 
-La pagina `/` presenta il prodotto, il flusso, gli impieghi e le domande frequenti. Lo studio è su `/studio`. Il pulsante Accedi apre l’accesso locale: gli account online e la registrazione non sono attivi e non vengono richieste credenziali.
+La pagina `/` presenta il prodotto, il flusso, gli impieghi e le domande frequenti. Lo studio è su `/studio`. Il pulsante Accedi apre `/account`: accesso, registrazione e archivio personale. L’integrazione Supabase è pronta da configurare; senza le variabili del servizio viene mostrato uno stato di preparazione, senza raccogliere credenziali. Configurazione e limiti in [docs/ACCOUNT-ONLINE.md](docs/ACCOUNT-ONLINE.md).
 
 Il logo Spazio nell’editor riporta alla homepage dopo avere completato eventuali salvataggi in corso. La sezione **Il tuo prossimo spazio, inizia qui** è parte della landing: consente di creare uno spazio, partire da una planimetria, esplorare la demo, aprire un file progetto o riprendere l’ultimo progetto personale. Il nome del progetto salvato compare nel relativo pulsante. Un file non valido viene rifiutato senza sostituire il salvataggio.
 
@@ -27,7 +27,7 @@ Il logo Spazio nell’editor riporta alla homepage dopo avere completato eventua
 
 ## Avvio sul PC
 
-Apri **AVVIA.cmd** con doppio clic. Richiede Node.js (già presente sul PC). La versione compilata si apre su http://localhost:4173. Lascia aperta la finestra di avvio; chiudila per fermare il server. Non occorre una connessione Internet dopo l’installazione.
+Apri **AVVIA.cmd** con doppio clic. Richiede Node.js (già presente sul PC). La versione compilata si apre su http://localhost:4173. Lascia aperta la finestra di avvio; chiudila per fermare il server. Per lavorare in locale non occorre una connessione Internet dopo l’installazione. Account e archivio online richiedono connessione e configurazione Supabase.
 
 Per lo sviluppo: `npm run dev`. Per aggiornare la versione avviata da AVVIA.cmd: `npm run build`.
 
@@ -74,7 +74,7 @@ Gli originali sono in `assets/people/originals`; le copie per il browser in `pub
 
 ## Salvataggio
 
-Il progetto corrente è salvato automaticamente in IndexedDB sul dispositivo, per browser e indirizzo. Le anteprime sulle porte 5173 e 4173 hanno salvataggi distinti: usa Esporta / Apri file progetto per trasferirli. Il file `.spazio.json` è la copia portabile. La cancellazione dei dati del browser elimina il salvataggio locale. Non sono presenti account, backend cloud o collaborazione simultanea. Annulla/ripristina mantiene fino a 40 modifiche durante la sessione.
+Il progetto corrente è salvato automaticamente in IndexedDB sul dispositivo, per browser e indirizzo. Le anteprime sulle porte 5173 e 4173 hanno salvataggi distinti: usa Esporta / Apri file progetto per trasferirli. Il file `.spazio.json` è la copia portabile. La cancellazione dei dati del browser elimina il salvataggio locale. Il pulsante **Salva online** conserva esplicitamente progetto e contenuti nell’account Supabase, quando configurato. I progetti cloud hanno copie locali separate per account/progetto e recupero delle bozze non sincronizzate. L’archivio personale è su `/account`. Non è presente collaborazione simultanea; aggiornamenti di revisioni obsolete vengono respinti. Dettagli, attivazione e verifiche in [docs/ACCOUNT-ONLINE.md](docs/ACCOUNT-ONLINE.md). Annulla/ripristina mantiene fino a 40 modifiche durante la sessione.
 
 ## VR e AR
 

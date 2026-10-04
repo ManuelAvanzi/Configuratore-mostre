@@ -1,0 +1,24 @@
+/* Full-viewport composition; each scene has its own portrait photograph. */
+.hero-scenes .hero-scene{inset:0;width:100%;height:100%;object-position:66% 50%;transform:none}
+.hero-scenes .hero-scene.active{animation:none}
+.hero-scenes{transform:none!important;will-change:auto}
+.hero-film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:66% 50%;opacity:0;transition:opacity 1.6s;pointer-events:none}
+.hero-film.active.ready{opacity:1}
+@media(max-width:700px){.hero-film{display:none}.hero-scenes .hero-scene.active{animation:portrait-breathe 9s linear both}.motion-paused .hero-scenes .hero-scene.active{animation-play-state:paused}}
+@keyframes portrait-breathe{from{transform:scale(1)}to{transform:scale(1.025)}}
+@media(prefers-reduced-motion:reduce){.hero-film{display:none}.hero-scenes .hero-scene.active{animation:none!important}}
+.hero-shade{background:linear-gradient(90deg,#0b1718cf 0%,#0b171870 36%,#0b171810 72%),linear-gradient(0deg,#0b171899,transparent 30%,transparent 80%,#0b171840)}
+.landing-page .cinema-hero .hero-copy{max-width:850px}
+.landing-page .cinema-hero h1{font-size:clamp(58px,5.8vw,90px)}
+.landing-page .walk-figure{aspect-ratio:16/10}
+.walk-figure>img{object-fit:cover;object-position:center;transform:none!important}
+@media(max-width:700px){
+ .landing-page .cinema-hero{height:100svh;min-height:100svh}
+ .hero-scenes .hero-scene{object-position:50% 50%}
+ .hero-shade{background:linear-gradient(180deg,#0b171860,#0b1718a8 20%,#0b17188c 58%,#0b171844 77%,#0b1718cf)}
+ .landing-page .cinema-hero h1{font-size:clamp(46px,10.5vw,62px)}
+ .scene-selector{gap:4px;flex-wrap:wrap}
+ .scene-selector button{padding:12px 7px;font-size:10px}
+ .scene-selector button small{margin-right:4px}
+ .landing-page .walk-figure{aspect-ratio:16/10}
+}

@@ -16,7 +16,7 @@ export const catalog=[
  {type:'bench',name:'Seduta',icon:'armchair',category:'Arredi',w:1.6,h:.45,d:.5,y:0,color:'#9d7555'},
  {type:'desk',name:'Desk accoglienza',icon:'table-2',category:'Arredi',w:1.8,h:1.05,d:.65,y:0,color:'#b89871'},
  {type:'sign',name:'Segnaletica',icon:'signpost',category:'Comunicazione',w:.6,h:.3,d:.04,y:1.7,color:'#234d40'},
- {type:'light',name:'Punto luce',icon:'lamp-ceiling',category:'Luci',w:.2,h:.25,d:.2,y:2.7,color:'#fff0ca'},
+ {type:'light',beamAngle:44,tilt:35,name:'Faro orientabile',icon:'lamp-ceiling',category:'Luci',w:.2,h:.25,d:.2,y:2.7,color:'#fff0ca'},
  {type:'scenery',name:'Elemento scenografico',icon:'shapes',category:'Strutture',w:1,h:1,d:1,y:0,color:'#af6648'},
  {type:'column',name:'Colonna',icon:'columns-2',category:'Architettura',w:.4,h:3.2,d:.4,y:0,color:'#efeee9'},
 ];
@@ -37,6 +37,8 @@ export function wallParts(w){const len=wallLength(w),out=[];let at=0;for(const o
 export function openingFits(w,o,exclude){return o.offset>=0&&o.width>=.2&&o.offset+o.width<=wallLength(w)+.001&&o.sill>=0&&o.height>=.2&&o.sill+o.height<=w.height+.001&&!w.openings.some(a=>a.id!==exclude&&o.offset<a.offset+a.width&&o.offset+o.width>a.offset);}
 export function validate(p){const n=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max; if(!p||p.version!==1||typeof p.name!=='string'||!n(p.width,2,100)||!n(p.depth,2,100)||!n(p.height,2,12)||!Array.isArray(p.walls)||!Array.isArray(p.objects)||p.walls.length>500||p.objects.length>500)throw Error('Il file non è un progetto Spazio valido.');
  if(typeof p.id!=='string'||typeof p.floor!=='string'||!/^#[0-9a-f]{6}$/i.test(p.floor)||p.name.length>200)throw Error('Proprietà progetto non valide.');
+ if(p.lighting&&(!n(p.lighting.ambient,0,3)||!n(p.lighting.daylight,0,3)||!n(p.lighting.environment,0,2)))throw Error('Illuminazione ambiente non valida.');
+ for(const o of p.objects)if(o.type==='light'){if(o.intensity!==undefined&&!n(o.intensity,0,2000)||o.beamAngle!==undefined&&!n(o.beamAngle,5,120)||o.tilt!==undefined&&!n(o.tilt,0,90))throw Error('Parametri faro non validi.');}
  validateSurface(p.floorSurface);
  for(const w of p.walls){if(w.surfaces!==undefined){if(!w.surfaces||typeof w.surfaces!=='object'||Array.isArray(w.surfaces))throw Error('Finiture parete non valide.');validateSurface(w.surfaces.a);validateSurface(w.surfaces.b);}}
  for(const o of p.objects){validateSurface(o.surface);if(o.surface&&!surfaceObjects.includes(o.type))throw Error('Questo elemento mantiene i propri materiali originali.');}

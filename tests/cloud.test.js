@@ -1,0 +1,74 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {webcrypto} from 'node:crypto';
+import {PGlite} from '@electric-sql/pglite';
+import {packAssets, unpackAssets} from '../src/cloud/assets.js';
+import {createProject, item, validate} from '../src/model.js';
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+
+test('Cloud assets round-trip, reuse and private ownership', async () => {
+  const owner='11111111-1111-4111-8111-111111111111';
+  const project=createProject(), image='data:image/png;base64,aGVsbG8=';
+  project.objects=[{...item('art'),image},{...item('art'),image}];
+  project.reference={src:image,width:12,depth:9};
+  const files=new Map();
+  const packed=await packAssets(project,owner,async(path,blob)=>files.set(path,blob));
+  assert.equal(files.size,1);assert.equal(packed.assetCount,1);
+  assert.equal(project.objects[0].image,image,'Source project remains portable');
+  const restored=await unpackAssets(packed.document,owner,async path=>files.get(path));
+  assert.deepEqual(restored,project);validate(restored);
+  await assert.rejects(unpackAssets(packed.document,'22222222-2222-4222-8222-222222222222',()=>assert.fail('Must reject before downloading')));
+  const bad=structuredClone(packed.document);bad.objects[0].image={storage:`${owner}/../secret`,mime:'image/png'};
+  await assert.rejects(unpackAssets(bad,owner,()=>assert.fail('No arbitrary paths')));
+  const external=structuredClone(project);external.objects[0].image='https://example.com/image.png';
+  await assert.rejects(packAssets(external,owner,()=>assert.fail('No external fetches')));
+  const huge=structuredClone(project);huge.objects[0].image='data:image/png;base64,'+Buffer.alloc(30*1024*1024+1).toString('base64');
+  await assert.rejects(packAssets(huge,owner,()=>assert.fail('No oversized uploads')));
+});
+
+test('PostgreSQL migration: users cannot read/write each other’s projects or files; stale writes conflict', async () => {
+  const db=new PGlite();
+  try {
+    await db.exec(`create role anon; create role authenticated;
+      create schema auth; create table auth.users(id uuid primary key);
+      create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
+      grant usage on schema public,auth to anon,authenticated;
+      create schema storage;
+      create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]);
+      create table storage.objects(id bigint generated always as identity,name text,bucket_id text);
+      create function storage.foldername(text) returns text[] language sql immutable as $$select string_to_array($1,'/')$$;
+      grant usage on schema storage to authenticated;
+      grant select,insert,update,delete on storage.objects to authenticated;
+      grant usage on all sequences in schema storage to authenticated;
+      alter table storage.objects enable row level security;
+      insert into auth.users values ('11111111-1111-4111-8111-111111111111'),('22222222-2222-4222-8222-222222222222');`);
+    await db.exec(await readFile(new URL('../supabase/migrations/202609190001_projects.sql',import.meta.url),'utf8'));
+    const ownerA='11111111-1111-4111-8111-111111111111',ownerB='22222222-2222-4222-8222-222222222222';
+    const projectId='33333333-3333-4333-8333-333333333333';
+    const save=revision=>db.query('select public.save_project($1,$2,$3,0) as revision',[projectId,revision,JSON.stringify(createProject())]);
+    const asUser=async id=>{await db.exec('reset role; set role authenticated;');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);};
+    await asUser(ownerA);
+    assert.equal((await save(0)).rows[0].revision,1);
+    assert.equal((await db.query('select * from public.projects')).rows.length,1);
+    assert.equal((await save(1)).rows[0].revision,2);
+    await assert.rejects(save(1),/conflict/);
+    await assert.rejects(db.query("update public.projects set name='Bypass' where id=$1",[projectId]),/permission denied/);
+    await db.query('insert into storage.objects(name,bucket_id) values ($1,$2)',[`${ownerA}/${'a'.repeat(64)}`,'project-assets']);
+    await asUser(ownerB);
+    assert.equal((await db.query('select * from public.projects')).rows.length,0);
+    assert.equal((await db.query('select * from storage.objects')).rows.length,0);
+    await assert.rejects(save(2),/conflict/);
+    await assert.rejects(save(0),/duplicate/);
+    await assert.rejects(db.query('insert into storage.objects(name,bucket_id) values ($1,$2)',[`${ownerA}/${'b'.repeat(64)}`,'project-assets']),/row-level security/);
+    await db.query('insert into storage.objects(name,bucket_id) values ($1,$2)',[`${ownerB}/${'b'.repeat(64)}`,'project-assets']);
+    assert.equal((await db.query('select * from storage.objects')).rows.length,1);
+    assert.equal((await db.query("update storage.objects set name='changed' returning *")).rows.length,0);
+    await db.exec('reset role; set role anon;');
+    await assert.rejects(db.query('select * from public.projects'),/permission denied/);
+    await assert.rejects(save(2),/permission denied/);
+    await db.exec('reset role;');
+    assert.equal((await db.query('select revision from public.projects')).rows[0].revision,2);
+    assert.equal((await db.query("select public from storage.buckets where id='project-assets'")).rows[0].public,false);
+  } finally {await db.close();}
+});
