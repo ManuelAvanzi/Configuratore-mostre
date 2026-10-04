@@ -12,7 +12,7 @@ try{
   document.body.innerHTML='<div id="photo" style="position:fixed;inset:0;width:100vw;height:100vh"></div>';
   const scene=new StudioScene(document.querySelector('#photo'),()=>{},()=>{},console.log);
   const p=await(await fetch('/examples/colore-luci.spazio.json')).json();
-  scene.build(p);scene.setVisit(true);scene.resize();window.galleryPhoto=scene;
+  scene.build(p);scene.setVisit(true);scene.setVisitQuality('detail');scene.resize();window.galleryPhoto=scene;
  });
  await page.waitForFunction(()=>window.galleryPhoto.pendingModels===0,{},{timeout:60000});
  await page.waitForTimeout(7000);

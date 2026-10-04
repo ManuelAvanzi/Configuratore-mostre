@@ -59,3 +59,4 @@
 .templates-entry{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;font-size:12px;color:#234d40;text-decoration:none;border:1px solid #ccd8c9;border-radius:6px;background:#f2f5e9}.templates-entry svg{width:15px}
 @media(max-width:1150px){.floating-tools [data-action=ceiling] span{display:none}}
 .text-field select[data-sculpture]{display:block;width:100%;margin:8px 0 14px;padding:10px;border:1px solid var(--line);border-radius:6px;background:#f7faf5;color:#234d40;font:inherit}
+.visit-quality{pointer-events:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:#466052}.visit-quality select{padding:9px;border:1px solid #d7dfd3;background:#ffffffeb;border-radius:6px;color:#234d40;font:inherit}.xr-actions{flex-wrap:wrap}@media(max-width:650px){.visit-quality{font-size:11px}.visit-quality select{padding:7px}.visit-bottom .xr-actions{gap:5px}}
