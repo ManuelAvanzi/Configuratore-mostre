@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {projectFromGLB,readProjectFile,MAX_PROJECT_FILE} from '../src/project-file.js';
+import {createProject,item} from '../src/model.js';
+function glb(json){const text=new TextEncoder().encode(JSON.stringify(json));const length=Math.ceil(text.length/4)*4;const bytes=new Uint8Array(20+length);bytes.fill(32,20);const v=new DataView(bytes.buffer);[0x46546c67,2,bytes.length,length,0x4e4f534a].forEach((n,i)=>v.setUint32(i*4,n,true));bytes.set(text,20);return bytes.buffer;}
+test('GLB Spazio preserves IDs, objects and lights',()=>{const project=createProject();project.objects.push(item('art'),{...item('light'),intensity:70});assert.deepEqual(projectFromGLB(glb({scene:0,scenes:[{extras:{spazio:{version:1,project}}}]})),project);});
+test('rejects generic GLB, unknown metadata versions, invalid projects and truncated data',()=>{assert.throws(()=>projectFromGLB(glb({scenes:[{}]})),/singolo modello/);assert.throws(()=>projectFromGLB(glb({scenes:[{extras:{spazio:{version:2}}}]})),/Versione/);assert.throws(()=>projectFromGLB(glb({scenes:[{extras:{spazio:{version:1,project:{}}}}]})),/non è un progetto/);assert.throws(()=>projectFromGLB(new ArrayBuffer(10)));const file=glb({});assert.throws(()=>projectFromGLB(file.slice(0,-4)));});
+test('shared reader supports JSON and enforces size limit before reading',async()=>{const project=createProject();assert.deepEqual(await readProjectFile(new Blob([JSON.stringify(project)])),project);await assert.rejects(readProjectFile({size:MAX_PROJECT_FILE+1,arrayBuffer(){throw Error('should not read');}}),/150 MB/);});

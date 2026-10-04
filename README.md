@@ -97,3 +97,14 @@ L’app consente la progettazione preliminare e l’attività didattica. Prima d
 - `npm run build`: build di produzione in `dist`.
 
 Stack: JavaScript modulare, Three.js, Vite, Lucide. Font locali DM Sans e Manrope da Google Fonts, licenza SIL Open Font License. Le licenze di Three.js, Lucide e delle altre dipendenze sono nei rispettivi pacchetti in node_modules.
+
+
+### Mostre GLB modificabili
+
+Da **Progetto → Esporta → Mostra 3D modificabile · GLB** si scarica un file `.spazio.glb`. Contiene geometrie, texture incorporate e luci standard glTF, più il progetto validato in `scenes[scene].extras.spazio` (versione 1). Gli elementi esportati hanno `extras.spazioId` e `extras.spazioType`.
+
+**Apri file progetto**, nell’editor o nella homepage, accetta JSON e GLB Spazio fino a 150 MB e ricostruisce gli elementi modificabili dai dati incorporati. Un GLB generico può essere caricato come singolo modello dal catalogo; non viene interpretato automaticamente come mostra. Le modifiche alle mesh effettuate in programmi esterni non aggiornano i dati Spazio: preservare il file originale per riaprire il progetto fedelmente.
+
+Le texture del modello esportato sono limitate a 1024 pixel; gli asset originali rimangono nei dati del progetto. Video, illuminazione ambiente ed effetti di rendering vengono ripristinati da Spazio ma non sono riprodotti identicamente dai visualizzatori glTF esterni. I video non vengono esportati come texture animate. Il soffitto viene incluso nella geometria completa; la riapertura nell’editor conserva la visualizzazione aperta predefinita.
+
+Verifica: `node scripts/verify-project-glb.mjs` (esporta e riapre), `node scripts/verify-template-glb.mjs` (template completo), test di validazione in `tests/project-file.test.js`.

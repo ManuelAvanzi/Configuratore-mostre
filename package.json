@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test tests/model.test.js tests/cloud.test.js tests/arrange.test.js tests/templates.test.js tests/sculptures.test.js",
+    "test": "node --test tests/model.test.js tests/cloud.test.js tests/arrange.test.js tests/templates.test.js tests/sculptures.test.js tests/project-file.test.js",
     "test:account": "node tests/account.mjs"
   },
   "dependencies": {
