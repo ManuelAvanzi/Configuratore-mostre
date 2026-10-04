@@ -21,12 +21,13 @@ export class StudioScene{
  this.transform=new TransformControls(this.camera,this.renderer.domElement);this.transform.addEventListener('objectChange',()=>this.renderer.shadowMap.needsUpdate=true);this.transform.setSize(.7);this.transform.setTranslationSnap(.05);this.scene.add(this.transform.getHelper());this.transform.addEventListener('dragging-changed',e=>this.orbit.enabled=!e.value);this.transform.addEventListener('mouseUp',()=>{const g=this.transform.object;if(g)this.onMove(g.userData.id,{x:g.position.x,z:g.position.z,y:Math.max(0,g.position.y),rotation:g.rotation.y*180/Math.PI});});this.transform.showY=false;
  this.keys={};this.yaw=0;this.pitch=0;this.clock=new T.Clock();this.videos=[];this.generation=0;this.ar=false;
  this.renderer.domElement.addEventListener('pointerdown',e=>{this.pointer={x:e.clientX,y:e.clientY};this.look={x:e.clientX,y:e.clientY};if(this.visit)this.renderer.domElement.setPointerCapture(e.pointerId);});this.renderer.domElement.addEventListener('pointermove',e=>{if(this.visit&&this.look&&e.buttons){this.yaw-=(e.clientX-this.look.x)*.004;this.pitch=Math.max(-1.3,Math.min(1.3,this.pitch-(e.clientY-this.look.y)*.004));this.look={x:e.clientX,y:e.clientY};}});
+ this.renderer.domElement.addEventListener('pointercancel',()=>{this.look=null;this.pointer=null;});
  this.renderer.domElement.addEventListener('pointerup',e=>{this.look=null;if(this.visit||this.transform.dragging||!this.pointer||Math.hypot(e.clientX-this.pointer.x,e.clientY-this.pointer.y)>5||this.transform.axis)return;const r=host.getBoundingClientRect(),ray=new T.Raycaster();ray.setFromCamera(new T.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1),this.camera);let hit=ray.intersectObjects([...this.objects.children,...this.walls.children,this.floorMesh],true).find(hit=>{for(let node=hit.object;node;node=node.parent)if(!node.visible)return false;return true;});if(hit){let g=hit.object;while(g&&!g.userData.id)g=g.parent;if(g)this.onSelect(g.userData.id,g.userData.wall?(hit.face?.materialIndex===5?'b':'a'):undefined,e.shiftKey);}else this.onSelect(null);});
  window.addEventListener('keydown',e=>{if(!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){this.keys[e.code]=true;if(this.visit&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();}});window.addEventListener('keyup',e=>this.keys[e.code]=false);window.addEventListener('blur',()=>this.keys={});new ResizeObserver(()=>this.resize()).observe(host);if(innerWidth>700){this.composer=new EffectComposer(this.renderer,new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:4}));
  this.composer.addPass(new RenderPass(this.scene,this.camera));
  this.ao=new GTAOPass(this.scene,this.camera,1,1,undefined,{radius:.45,thickness:.2,distanceExponent:2,samples:8,screenSpaceRadius:false});this.ao.blendIntensity=.65;this.composer.addPass(this.ao);this.composer.addPass(new OutputPass());}
  this.renderer.setAnimationLoop((_,frame)=>this.frame(frame));
- this.renderer.xr.addEventListener('sessionend',()=>{this.ar=false;this.world.scale.setScalar(1);this.world.position.set(0,0,0);this.world.rotation.set(0,0,0);this.scene.background=new T.Color('#e9eae6');this.rig.position.set(0,0,0);this.setVisit(true);});
+ this.renderer.xr.addEventListener('sessionend',()=>this.restoreImmersive());
  }
  setVisitQuality(value){this.visitQuality=value==='detail'?'detail':'smooth';this.resize();}
  resize(){const ratio=Math.min(devicePixelRatio,this.visit&&this.visitQuality!=='detail'?1.25:2);if(this.renderer.getPixelRatio()!==ratio){this.renderer.setPixelRatio(ratio);this.composer?.setPixelRatio(ratio);}let r=this.host.getBoundingClientRect();if(!r.width||!r.height)return;this.camera.aspect=r.width/r.height;this.camera.updateProjectionMatrix();this.renderer.setSize(r.width,r.height);this.composer?.setSize(r.width,r.height);}
@@ -80,7 +81,29 @@ export class StudioScene{
  if(this.walls)for(const g of this.walls.children){const w=g.userData.wall,outerZ=Math.abs(w.az-w.bz)<.01&&Math.abs(Math.abs(w.az)-this.project.depth/2)<.01,outerX=Math.abs(w.ax-w.bx)<.01&&Math.abs(Math.abs(w.ax)-this.project.width/2)<.01;const facing=outerZ&&Math.sign(w.az)*this.camera.position.z>this.project.depth/2||outerX&&Math.sign(w.ax)*this.camera.position.x>this.project.width/2;const shown=this.visit||!this.cutaway||!facing||w.id===this.selected;if(g.visible!==shown)this.renderer.shadowMap.needsUpdate=true;g.visible=shown;}
  if(this.renderer.xr.isPresenting&&!this.ar){for(const source of this.renderer.xr.getSession().inputSources){const axes=source.gamepad?.axes;if(axes?.length>=4){const cam=this.renderer.xr.getCamera(),dir=new T.Vector3();cam.getWorldDirection(dir);dir.y=0;dir.normalize();const side=new T.Vector3().crossVectors(dir,new T.Vector3(0,1,0));const dx=(dir.x*-axes[3]+side.x*axes[2])*dt*1.6,dz=(dir.z*-axes[3]+side.z*axes[2])*dt*1.6;let pos=cam.getWorldPosition(new T.Vector3());if(canWalk(this.project,pos.x+dx,pos.z+dz)){this.rig.position.x+=dx;this.rig.position.z+=dz;}}}}
  if(this.focusTransition&&!this.visit){const f=this.focusTransition,t=Math.min(1,(performance.now()-f.start)/500),ease=t*t*(3-2*t);this.camera.position.lerpVectors(f.from,f.to,ease);this.orbit.target.lerpVectors(f.fromTarget,f.target,ease);this.orbit.update();if(t===1){this.focusTransition=null;this.orbit.enableDamping=true;}}this.selection?.update();this.renderFrame();}
- async immersive(mode){if(!navigator.xr||!await navigator.xr.isSessionSupported(mode)){this.notify(mode==='immersive-vr'?'VR non disponibile: apri con un browser compatibile sul visore.':'AR non disponibile: occorrono HTTPS e un dispositivo con WebXR AR.');return;}try{let session=await navigator.xr.requestSession(mode,{optionalFeatures:['local-floor']});this.renderer.xr.setReferenceSpaceType('local-floor');this.ar=mode==='immersive-ar';if(this.ar){this.scene.background=null;this.world.scale.setScalar(.06);this.world.position.set(0,-.4,-1.2);}else this.rig.position.set(0,0,this.project.depth/2-1);this.camera.position.set(0,0,0);await this.renderer.xr.setSession(session);}catch(e){this.notify('Impossibile avviare la sessione immersiva: '+e.message);}}
+ restoreImmersive(){
+  const saved=this.immersiveState;this.immersiveState=null;this.ar=false;
+  if(!saved)return;
+  this.world.scale.copy(saved.scale);this.world.position.copy(saved.worldPosition);this.world.quaternion.copy(saved.worldRotation);this.scene.background=saved.background;
+  this.rig.position.copy(saved.rigPosition);this.camera.position.copy(saved.cameraPosition);this.camera.quaternion.copy(saved.cameraRotation);this.camera.fov=saved.fov;this.camera.updateProjectionMatrix();
+  this.keys={};this.clock.getDelta();this.renderer.shadowMap.needsUpdate=true;this.resize();
+ }
+ async immersive(mode){
+  if(this.immersivePending||this.renderer.xr.isPresenting)return;
+  this.immersivePending=true;let session;
+  try{
+   if(!navigator.xr||!await navigator.xr.isSessionSupported(mode)){this.notify(mode==='immersive-vr'?'VR non disponibile su questo dispositivo o browser.':'AR non disponibile su questo dispositivo o browser: servono HTTPS e supporto WebXR AR.');return;}
+   const ar=mode==='immersive-ar',reference=ar?'local':'local-floor';
+   session=await navigator.xr.requestSession(mode,{requiredFeatures:[reference]});
+   this.immersiveState={scale:this.world.scale.clone(),worldPosition:this.world.position.clone(),worldRotation:this.world.quaternion.clone(),background:this.scene.background,rigPosition:this.rig.position.clone(),cameraPosition:this.camera.position.clone(),cameraRotation:this.camera.quaternion.clone(),fov:this.camera.fov};
+   this.renderer.xr.setReferenceSpaceType(reference);this.ar=ar;this.keys={};
+   if(ar){this.scene.background=null;this.world.scale.setScalar(.06);this.world.position.set(0,-.4,-1.2);this.rig.position.set(0,0,0);}
+   else this.rig.position.set(this.camera.position.x,0,this.camera.position.z);
+   this.camera.position.set(0,0,0);await this.renderer.xr.setSession(session);this.renderer.shadowMap.needsUpdate=true;
+  }catch(e){if(session)try{await session.end();}catch{}this.restoreImmersive();this.notify('Impossibile avviare la sessione immersiva: '+e.message);}
+  finally{this.immersivePending=false;}
+ }
+
  renderFrame(){if(this.composer&&(!this.visit||this.visitQuality==='detail')&&!this.renderer.xr.isPresenting&&innerWidth>700){this.composer.render();}else this.renderer.render(this.scene,this.camera);}
  screenshot(){this.renderFrame();return this.renderer.domElement.toDataURL('image/png');}
 }
