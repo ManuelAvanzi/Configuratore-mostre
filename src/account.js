@@ -1,3 +1,4 @@
+import {producer} from './producer.js';
 import './landing.css';
 import './account.css';
 import {cloud, cloudEnabled, currentUser, message} from './cloud/client.js';
@@ -9,7 +10,7 @@ const params = new URLSearchParams(location.search);
 let mode = params.get('mode') === 'signup' ? 'signup' : params.get('mode') === 'recovery' ? 'recovery' : 'login';
 let user;
 
-app.innerHTML = `<header class="account-header"><a class="logo" href="/">⌑ spazio</a><a href="/studio?start=resume">Studio locale ↗</a></header><main id="account-main" class="account-main"><p role="status">Apertura dell’area personale…</p></main>`;
+app.innerHTML = `<header class="account-header"><a class="logo" href="/">⌑ spazio</a><a href="/studio?start=resume">Studio locale ↗</a></header><main id="account-main" class="account-main"><p role="status">Apertura dell’area personale…</p></main><footer class="account-producer">${producer()}</footer>`;
 const main = document.querySelector('#account-main');
 const notice = text => { document.querySelector('#account-status').textContent = text; };
 
