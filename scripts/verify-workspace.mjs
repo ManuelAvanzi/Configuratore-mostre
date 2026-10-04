@@ -6,7 +6,7 @@ await page.goto('http://localhost:5173/studio?example=colore-luci');
 await expect(page.locator('#project-name')).toHaveValue('Abitare il colore — Edizione luce',{timeout:60000});
 await page.waitForTimeout(3000);
 await page.waitForTimeout(1400);await page.screenshot({path:'output/review/studio-updated.png'});
-const stage=await page.locator('.stage').boundingBox();await page.locator('[data-action=toggle-library]').click();expect((await page.locator('.stage').boundingBox()).width).toBeGreaterThan(stage.width);await page.locator('[data-action=toggle-library]').click();
+const stage=await page.locator('.stage').boundingBox();await page.locator('.panel-menu summary').click();await page.locator('[data-action=toggle-library]').click();expect((await page.locator('.stage').boundingBox()).width).toBeGreaterThan(stage.width);await page.locator('.panel-menu summary').click();await page.locator('[data-action=toggle-library]').click();
 await page.locator('[data-library-tab=objects]').click();
 const checks=page.locator('[data-multi]');await checks.nth(4).check();await checks.nth(5).check();await expect(page.locator('#properties h2')).toHaveText('2 elementi');
 await page.locator('[data-arrange=align-center]').click();
@@ -19,7 +19,7 @@ await expect.poll(async()=>{const saved=await readSaved();return saved.objects.f
 await expect(page.locator('[data-action=undo]').first()).toBeEnabled();
 await page.locator('[data-action=duplicate]').click();await expect(page.locator('#count')).toHaveText('52 elementi');
 await page.locator('[data-action=delete]').click();await expect(page.locator('#count')).toHaveText('50 elementi');
-await page.locator('[data-action=undo]').first().click();await expect(page.locator('#count')).toHaveText('52 elementi');
+await page.locator('.top-actions summary').click();await page.locator('[data-action=undo]').first().click();await expect(page.locator('#count')).toHaveText('52 elementi');
 await checks.nth(4).check();await checks.nth(5).check();await checks.nth(6).check();await page.screenshot({path:'output/review/multi-updated.png'});
 await page.locator('[data-mode=space]').click();await expect(page.locator('#properties h2')).toHaveText('3 elementi');
 await page.locator('.top-actions [data-action=visit]').click();await page.locator('[data-action=layout]').click();await expect(page.locator('#properties h2')).toHaveText('3 elementi');
