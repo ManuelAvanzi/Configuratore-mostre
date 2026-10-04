@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {floorArea,insideFloor} from '../src/floor-plan.js';
+import {validate,canWalk,createProject} from '../src/model.js';
+import {projectChecks,resizeRoom} from '../src/planning.js';
+for(const [id,area] of [['atlante-materia',488],['corte-luce',720]])test('template '+id+': perimetro, area, salvataggio e ingombri',()=>{const p=JSON.parse(fs.readFileSync('public/examples/'+id+'.spazio.json','utf8'));validate(p);assert.equal(floorArea(p),area);assert.deepEqual(projectChecks(p),[]);assert.deepEqual(validate(JSON.parse(JSON.stringify(p))).floorOutline,p.floorOutline);assert.equal(insideFloor(p,0,8),false);assert.equal(canWalk(p,0,8),false);assert.equal(insideFloor(p,-13,6),true);assert.throws(()=>resizeRoom(p,'width',40),/perimetro/);});
+test('perimetri importati: rifiuta incroci, vertici ripetuti e coordinate fuori ingombro',()=>{for(const points of [[[0,0],[2,2],[0,2],[2,0]],[[0,0],[0,0],[1,1]],[[0,0],[100,0],[0,1]]]){const p=createProject();p.floorOutline=points.map(([x,z])=>({x,z}));assert.throws(()=>validate(p),/pavimento/);}});
+test('rettangoli esistenti conservano superficie e confini',()=>{const p=createProject(12,9);assert.equal(floorArea(p),108);assert.equal(insideFloor(p,5.9,0,.2),false);assert.equal(insideFloor(p,5.7,0,.2),true);});
+test('un ingombro non può attraversare il vuoto della corte con i vertici nelle ali',()=>{const p=JSON.parse(fs.readFileSync('public/examples/corte-luce.spazio.json','utf8'));p.objects=[{id:'bridge',type:'scenery',name:'Ponte',x:0,z:0,y:0,w:24,d:1,h:1,rotation:0,color:'#ffffff'}];assert.ok(projectChecks(p).some(i=>i.title==='Fuori dal pavimento'));});

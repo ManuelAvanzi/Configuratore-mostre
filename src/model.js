@@ -1,3 +1,5 @@
+import {sculptureCatalog} from './sculpture-catalog.js';
+import {validateFloor,insideFloor} from './floor-plan.js';
 import {peopleCatalog,legacyPeople,migratePerson} from './people-catalog.js';
 import {validateSurface,FLOOR_ID,surfaceObjects} from './surfaces.js';
 export const uid=()=>crypto.randomUUID();
@@ -6,6 +8,7 @@ export const round=x=>Math.round(x*100)/100;
 export const catalog=[
  {type:'art',name:'Quadro / fotografia',icon:'image',category:'Opere',w:1.2,h:.8,d:.05,y:1.15,color:'#e8c88e'},
  {type:'sculpture',name:'Scultura',icon:'gem',category:'Opere',w:.6,h:1.2,d:.6,y:0,color:'#aa7554'},
+ ...sculptureCatalog,
  ...peopleCatalog,
  {type:'panel',name:'Pannello informativo',icon:'text',category:'Comunicazione',w:1,h:1.5,d:.06,y:.5,color:'#f1eee6'},
  {type:'case',name:'Teca',icon:'box',category:'Strutture',w:1.2,h:1.2,d:.65,y:0,color:'#c3d5d7'},
@@ -45,9 +48,10 @@ export function validate(p){const n=(v,min,max)=>typeof v==='number'&&Number.isF
  const ids=new Set();const id=x=>{if(typeof x!=='string'||x===FLOOR_ID||ids.has(x))throw Error('Identificatori non validi.');ids.add(x)};
  if(p.measurements!==undefined){if(!Array.isArray(p.measurements)||p.measurements.length>200)throw Error('Massimo 200 quote per progetto.');for(const m of p.measurements){if(!m||!['ax','az','bx','bz'].every(k=>n(m[k],-100,100))||Math.hypot(m.bx-m.ax,m.bz-m.az)<.1)throw Error('Quota non valida: indica due punti distanti almeno 10 cm.');id(m.id);}}
  for(const w of p.walls){id(w.id);if(!['ax','az','bx','bz'].every(k=>n(w[k],-100,100))||!n(w.height,.2,12)||!n(w.thickness,.03,2)||wallLength(w)<.1||!Array.isArray(w.openings))throw Error('Parete non valida.');for(const o of w.openings){id(o.id);if(!['door','window','opening'].includes(o.type)||!['offset','width','height','sill'].every(k=>n(o[k],0,200))||!openingFits(w,o,o.id))throw Error('Aperture sovrapposte o fuori parete.');}}
+ validateFloor(p);
  for(const o of p.objects){id(o.id);if(![...catalog.map(c=>c.type),...Object.keys(legacyPeople),'model'].includes(o.type)||typeof o.name!=='string'||!['w','h','d'].every(k=>n(o[k],.01,100))||!['x','z','y','rotation'].every(k=>n(o[k],-360,360))||typeof o.color!=='string'||!/^#[0-9a-f]{6}$/i.test(o.color))throw Error('Elemento non valido.');for(const k of ['image','video','model'])if(o[k]&&!(typeof o[k]==='string'&&o[k].startsWith('data:')))throw Error('Asset esterno non consentito.');migratePerson(o);}
  for(const o of p.objects){if(o.text!==undefined&&typeof o.text!=='string'||o.name.length>200)throw Error('Testo non valido.');if(o.image&&!/^data:image\/(png|jpeg|webp);base64,/.test(o.image))throw Error('Formato immagine non supportato.');if(o.video&&!/^data:video\/(mp4|webm);base64,/.test(o.video))throw Error('Formato video non supportato.');if(o.model)validateGLB(o.model);}
  if(p.reference&&(!n(p.reference.width,.1,200)||!n(p.reference.depth,.1,200)||typeof p.reference.src!=='string'||!/^data:image\/(png|jpeg|webp);base64,/.test(p.reference.src)))throw Error('Riferimento non valido.');return p;}
 export function distanceToWall(x,z,w){const dx=w.bx-w.ax,dz=w.bz-w.az,t=Math.max(0,Math.min(1,((x-w.ax)*dx+(z-w.az)*dz)/(dx*dx+dz*dz)));return {distance:Math.hypot(x-w.ax-t*dx,z-w.az-t*dz),offset:t*wallLength(w)};}
-export function canWalk(p,x,z){if(Math.abs(x)>p.width/2-.2||Math.abs(z)>p.depth/2-.2)return false;for(const w of p.walls){const a=distanceToWall(x,z,w);if(a.distance<w.thickness/2+.18&&!w.openings.some(o=>o.sill<.1&&o.height>1.7&&a.offset>o.offset+.18&&a.offset<o.offset+o.width-.18))return false;}return !p.objects.some(o=>{if(o.y>1.7||['art','sign','light','panel'].includes(o.type))return false;const r=o.rotation*Math.PI/180,dx=x-o.x,dz=z-o.z;return Math.abs(dx*Math.cos(r)-dz*Math.sin(r))<o.w/2+.18&&Math.abs(dx*Math.sin(r)+dz*Math.cos(r))<o.d/2+.18;});}
+export function canWalk(p,x,z){if(!insideFloor(p,x,z,.2))return false;for(const w of p.walls){const a=distanceToWall(x,z,w);if(a.distance<w.thickness/2+.18&&!w.openings.some(o=>o.sill<.1&&o.height>1.7&&a.offset>o.offset+.18&&a.offset<o.offset+o.width-.18))return false;}return !p.objects.some(o=>{if(o.y>1.7||['art','sign','light','panel'].includes(o.type))return false;const r=o.rotation*Math.PI/180,dx=x-o.x,dz=z-o.z;return Math.abs(dx*Math.cos(r)-dz*Math.sin(r))<o.w/2+.18&&Math.abs(dx*Math.sin(r)+dz*Math.cos(r))<o.d/2+.18;});}
 

@@ -1,3 +1,4 @@
+import {footprintInFloor} from './floor-plan.js';
 import {wallLength,wallParts,round} from './model.js';
 
 // Footprints use the same Y-axis rotation as the Three.js scene.
@@ -24,7 +25,7 @@ export function projectChecks(p){
  const solids=p.walls.flatMap((w,index)=>{const length=wallLength(w),dx=(w.bx-w.ax)/length,dz=(w.bz-w.az)/length;return wallParts(w).map(part=>({id:w.id,label:`Parete ${index+1}`,x:w.ax+dx*(part.start+part.end)/2,z:w.az+dz*(part.start+part.end)/2,w:part.end-part.start,d:w.thickness,y:part.bottom,h:part.top-part.bottom,rotation:-Math.atan2(dz,dx)*180/Math.PI}));});
  for(let i=0;i<p.objects.length;i++){
   const o=p.objects[i];
-  if(footprint(o).some(q=>Math.abs(q.x)>p.width/2+.005||Math.abs(q.z)>p.depth/2+.005))add(o.id,'Fuori dal pavimento',o.name);
+  if(!footprintInFloor(p,footprint(o)))add(o.id,'Fuori dal pavimento',o.name);
   if(o.y<-.005||o.y+o.h>p.height+.005)add(o.id,'Quota fuori ambiente',`${o.name} · sommità ${round(o.y+o.h)} m`);
   const wall=solids.find(w=>volumesOverlap(o,w));if(wall)add(o.id,'Intersezione con parete',`${o.name} · ${wall.label}`);
   for(let j=i+1;j<p.objects.length&&issues.length<100;j++)if(volumesOverlap(o,p.objects[j]))add(o.id,'Ingombri sovrapposti',`${o.name} / ${p.objects[j].name}`);
@@ -32,6 +33,7 @@ export function projectChecks(p){
  return issues;
 }
 export function resizeRoom(p,key,value){
+ if(p.floorOutline)throw Error('Questo template ha un perimetro articolato: conserva l’ingombro e modifica pareti interne e allestimento.');
  const previous=p[key],axis=key==='width'?['ax','bx']:['az','bz'];
  // Move perimeter endpoints, preserving interior coordinates, assets and real dimensions.
  for(const wall of p.walls)for(const k of axis)if(Math.abs(Math.abs(wall[k])-previous/2)<.001)wall[k]=Math.sign(wall[k])*value/2;
