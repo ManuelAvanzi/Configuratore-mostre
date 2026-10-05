@@ -10,3 +10,5 @@
 .app-footer .producer-credit{margin:0 8px}
 .visit-bottom .producer-credit{margin-top:10px}
 @media(max-width:650px){.producer-credit{gap:10px;font-size:11px}.producer-credit img{width:145px}.producer-credit--compact{font-size:9px}.producer-credit--compact img{width:85px}.app-footer{flex-wrap:wrap;gap:8px}.app-footer .producer-credit{margin-left:auto}.app-footer .producer-credit>span{display:none}.account-producer{padding:22px 6%}}
+
+.visit-bottom .producer-credit{margin:0;gap:10px}.visit-bottom .producer-credit img{width:145px;padding:0;background:transparent;border-radius:0}.visit-bottom .producer-credit>span{display:none}

@@ -108,3 +108,7 @@ Da **Progetto → Esporta → Mostra 3D modificabile · GLB** si scarica un file
 Le texture del modello esportato sono limitate a 1024 pixel; gli asset originali rimangono nei dati del progetto. Video, illuminazione ambiente ed effetti di rendering vengono ripristinati da Spazio ma non sono riprodotti identicamente dai visualizzatori glTF esterni. I video non vengono esportati come texture animate. Il soffitto viene incluso nella geometria completa; la riapertura nell’editor conserva la visualizzazione aperta predefinita.
 
 Verifica: `node scripts/verify-project-glb.mjs` (esporta e riapre), `node scripts/verify-template-glb.mjs` (template completo), test di validazione in `tests/project-file.test.js`.
+
+
+### Visita e panorama 360°
+La visita usa una barra compatta senza pulsanti direzionali o testo introduttivo. Si cammina con WASD e si guarda trascinando; Esc torna all’editor. Il logo PNG trasparente è mostrato senza riquadro bianco. Foto 360° esporta un PNG equirettangolare 4096 × 2048 dal punto di osservazione, adatto a un visualizzatore panoramico, catturando sei direzioni della scena. La normale esportazione Vista corrente PNG rimane disponibile nell’editor.
