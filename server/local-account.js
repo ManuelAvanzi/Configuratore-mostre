@@ -69,7 +69,7 @@ export function localAccount(directory) {
         const operation=queue.then(async()=>{
           let old; try {old=await read(path);} catch(e) {if(e.code!=='ENOENT') throw e;}
           if((old?.revision || 0)!==input.revision) throw fail(409,'Il progetto è cambiato. Riaprilo o salva una nuova copia.','P0001');
-          const record={id,owner:user.id,revision:(old?.revision||0)+1,name:project.name,width:project.width,depth:project.depth,object_count:project.objects.length,asset_count:(JSON.stringify(project).match(/data:[^;]+;base64,/g)||[]).length,updated_at:new Date().toISOString(),project};
+          const record={archive:project.archive,id,owner:user.id,revision:(old?.revision||0)+1,name:project.name,width:project.width,depth:project.depth,object_count:project.objects.length,asset_count:(JSON.stringify(project).match(/data:[^;]+;base64,/g)||[]).length,updated_at:new Date().toISOString(),project};
           await atomic(path,record); return {id,owner:user.id,revision:record.revision};
         });
         queue=operation.catch(()=>{}); return send(200,await operation);

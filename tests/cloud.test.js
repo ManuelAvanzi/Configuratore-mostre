@@ -77,3 +77,16 @@ test('PostgreSQL migration: users cannot read/write each other’s projects or f
     assert.equal((await db.query("select public from storage.buckets where id='project-assets'")).rows[0].public,false);
   } finally {await db.close();}
 });
+
+test('Archive cover and reversible trash survive cloud round-trip without changing exhibition assets',async()=>{
+ const owner='11111111-1111-4111-8111-111111111111',project=createProject();
+ project.archive={cover:'data:image/jpeg;base64,aGVsbG8=',trashed:true};
+ project.objects=[{...item('art'),image:'data:image/png;base64,aGVsbG8='}];
+ const files=new Map(),packed=await packAssets(project,owner,async(path,blob)=>files.set(path,blob));
+ const restored=validate(await unpackAssets(packed.document,owner,async path=>files.get(path)));
+ assert.deepEqual(restored,project);
+ restored.archive.trashed=false;validate(restored);assert.equal(restored.objects.length,1);
+ for(const cover of ['https://example.com/cover.jpg','data:image/svg+xml;base64,aGVsbG8=','data:image/png;base64,'+'a'.repeat(300000)]){
+  assert.throws(()=>validate({...project,archive:{cover}}));
+ }
+});

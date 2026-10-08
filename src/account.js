@@ -3,6 +3,7 @@ import './landing.css';
 import './account.css';
 import {cloud, cloudEnabled, localAccountEnabled, currentUser, message} from './cloud/client.js';
 import {listProjects} from './cloud/projects.js';
+import {cardMenu,bindCardActions} from './account-card-actions.js';
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app = document.querySelector('#app');
@@ -49,7 +50,7 @@ function authForm() {
 }
 
 async function dashboard() {
-  main.innerHTML = `<section class="archive-heading"><div><span class="eyebrow">IL TUO ARCHIVIO PERSONALE</span><h1>I miei progetti</h1><p>Riapri gli allestimenti salvati per proseguire il lavoro e discuterlo in classe.</p></div><a class="button solid" href="/studio?start=new">+ Nuovo progetto</a></section><div class="account-toolbar"><span>${escape(user.email === 'redazione@example.invalid' ? 'redazione' : user.email)}</span><button id="signout">Esci dall’account</button></div><div class="archive-local"><div><b>Hai iniziato su questo dispositivo?</b><p>Apri il progetto locale e scegli “Salva nel mio account” per aggiungerlo al tuo archivio.</p></div><a href="/studio?start=resume">Riprendi il progetto locale ↗</a></div><div class="archive-controls"><h2>Progetti salvati <span id="project-count"></span></h2><label>Cerca<input id="project-search" type="search" placeholder="Nome della mostra"></label></div><p id="account-status" role="status" aria-live="polite">Caricamento dei progetti…</p><div id="project-grid" class="project-grid"></div>`;
+  main.innerHTML = `<section class="archive-heading"><div><span class="eyebrow">IL TUO ARCHIVIO PERSONALE</span><h1>I miei progetti</h1><p>Riapri gli allestimenti salvati per proseguire il lavoro e discuterlo in classe.</p></div><a class="button solid" href="/studio?start=new">+ Nuovo progetto</a></section><div class="account-toolbar"><span>${escape(user.email === 'redazione@example.invalid' ? 'redazione' : user.email)}</span><button id="signout">Esci dall’account</button></div><div class="archive-local"><div><b>Hai iniziato su questo dispositivo?</b><p>Apri il progetto locale e scegli “Salva nel mio account” per aggiungerlo al tuo archivio.</p></div><a href="/studio?start=resume">Riprendi il progetto locale ↗</a></div><div class="archive-controls"><h2>Progetti salvati <span id="project-count"></span></h2><button id="show-trash" type="button" aria-pressed="false">Cestino</button><label>Cerca<input id="project-search" type="search" placeholder="Nome della mostra"></label></div><p id="account-status" role="status" aria-live="polite">Caricamento dei progetti…</p><div id="project-grid" class="project-grid"></div>`;
   document.querySelector('#signout').onclick = async event => {
     event.target.disabled = true;
     try {const {error} = await cloud.auth.signOut({scope:'local'}); if (error) throw error; location.assign('/account');}
@@ -57,14 +58,19 @@ async function dashboard() {
   };
   try {
     const projects = await listProjects();
+    let showTrash=false;
     document.querySelector('#project-count').textContent = `(${projects.length})`;
     notice('');
     const render = () => {
       const query = document.querySelector('#project-search').value.trim().toLocaleLowerCase();
-      const matches = projects.filter(project => project.name.toLocaleLowerCase().includes(query));
-      document.querySelector('#project-grid').innerHTML = matches.length ? matches.map(project => `<article class="project-card"><a href="/studio?project=${encodeURIComponent(project.id)}" class="project-card-preview" aria-label="Apri ${escape(project.name)}"><div class="plan-symbol" aria-hidden="true"><i></i><i></i><i></i></div><span>${Number(project.width)} × ${Number(project.depth)} m</span></a><div class="project-card-body"><span class="eyebrow">PROGETTO PRIVATO</span><h3>${escape(project.name)}</h3><p>${Number(project.object_count)} elementi · ${Number(project.asset_count)} contenuti caricati</p><div><small>${escape(new Date(project.updated_at).toLocaleDateString('it-IT', {day:'numeric', month:'short', year:'numeric'}))}</small><a href="/studio?project=${encodeURIComponent(project.id)}">Apri progetto ↗</a></div></div></article>`).join('') : `<div class="archive-empty"><span aria-hidden="true">⌑</span><h3>${query ? 'Nessun progetto trovato' : 'Nessun progetto salvato.'}</h3><p>${query ? 'Prova un altro nome.' : 'Crea una mostra, poi scegli “Salva nel mio account” nello studio. Qui compariranno il progetto e i suoi contenuti.'}</p>${query ? '' : '<a class="button outline" href="/studio?start=new">Crea il primo progetto ↗</a>'}</div>`;
+      const visible=projects.filter(project=>Boolean(project.archive?.trashed)===showTrash);
+      document.querySelector('#project-count').textContent=`(${visible.length})`;
+      const matches = visible.filter(project => project.name.toLocaleLowerCase().includes(query));
+      document.querySelector('#project-grid').innerHTML = matches.length ? matches.map(project => `<article class="project-card" data-project-id="${escape(project.id)}">${cardMenu(project,escape)}<a href="/studio?project=${encodeURIComponent(project.id)}" class="project-card-preview" aria-label="Apri ${escape(project.name)}">${/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(project.archive?.cover||'')?`<img class="project-cover" src="${escape(project.archive.cover)}" alt="Copertina di ${escape(project.name)}"/>`:'<div class="plan-symbol" aria-hidden="true"><i></i><i></i><i></i></div>'}<span>${Number(project.width)} × ${Number(project.depth)} m</span></a><div class="project-card-body"><span class="eyebrow">PROGETTO PRIVATO</span><h3>${escape(project.name)}</h3><p>${Number(project.object_count)} elementi · ${Number(project.asset_count)} contenuti caricati</p><div><small>${escape(new Date(project.updated_at).toLocaleDateString('it-IT', {day:'numeric', month:'short', year:'numeric'}))}</small><a href="/studio?project=${encodeURIComponent(project.id)}">Apri progetto ↗</a></div></div></article>`).join('') : `<div class="archive-empty"><span aria-hidden="true">⌑</span><h3>${query ? 'Nessun progetto trovato' : showTrash?'Il cestino è vuoto.':'Nessun progetto salvato.'}</h3><p>${query ? 'Prova un altro nome.' : 'Crea una mostra, poi scegli “Salva nel mio account” nello studio. Qui compariranno il progetto e i suoi contenuti.'}</p>${query ? '' : '<a class="button outline" href="/studio?start=new">Crea il primo progetto ↗</a>'}</div>`;
     };
     document.querySelector('#project-search').oninput = render;
+    document.querySelector('#show-trash').onclick=e=>{showTrash=!showTrash;e.currentTarget.setAttribute('aria-pressed',String(showTrash));e.currentTarget.textContent=showTrash?'Torna ai progetti':'Cestino';render();};
+    bindCardActions(document.querySelector('#project-grid'),{notice,refresh:dashboard});
     render();
   } catch (error) {
     notice(message(error));

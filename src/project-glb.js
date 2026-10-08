@@ -7,8 +7,12 @@ import {MAX_PROJECT_FILE} from './project-file.js';
 export async function exportProjectGLB(studio,project){
  if(studio.renderer.xr.isPresenting)throw Error('Esci dalla modalità VR o AR prima di esportare.');
  validate(project);
- if(studio.pendingModels||!materialsReady()||studio.objects.children.some(g=>!g.children.length))throw Error('Attendi il caricamento completo di modelli e materiali prima di esportare.');
- studio.world.traverse(o=>{for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m)for(const v of Object.values(m))if(v?.isTexture&&!v.isVideoTexture){const image=v.image;if(!image||image.complete===false||image.naturalWidth===0)throw Error('Attendi il caricamento delle immagini prima di esportare.');}});
+ const ready=()=>{
+  if(studio.pendingModels||!materialsReady()||studio.objects.children.some(g=>!g.children.length))return false;
+  let complete=true;studio.world.traverse(o=>{for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m)for(const v of Object.values(m))if(v?.isTexture&&!v.isVideoTexture){const image=v.image;if(!image||image.complete===false||image.naturalWidth===0)complete=false;}});return complete;
+ };
+ const deadline=Date.now()+60000;
+ while(!ready()){if(Date.now()>deadline)throw Error('Caricamento incompleto. Attendi i contenuti e riprova a esportare.');await new Promise(resolve=>setTimeout(resolve,150));}
  const scene=new Scene();scene.name=project.name;scene.userData.spazio={version:1,producer:'CarraroLAB',project:JSON.parse(JSON.stringify(project))};
  const root=clone(studio.world);root.position.set(0,0,0);root.rotation.set(0,0,0);root.scale.setScalar(1);
  // Editor helpers are excluded; architectural parts stay complete despite cutaway mode.

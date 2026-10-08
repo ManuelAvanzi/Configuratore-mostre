@@ -147,3 +147,7 @@
 .project-checks summary span{float:right}
 .project-checks-content{padding:0 16px 18px}
 .project-checks-content p{font-size:12px;line-height:1.6}
+
+.app-footer .producer-credit{order:10;margin-left:auto;justify-content:flex-end}
+
+.reference-start-preview{display:block;width:100%;height:220px;object-fit:contain;background:#f2f5ef;border:1px solid var(--line);border-radius:8px;margin:16px 0}

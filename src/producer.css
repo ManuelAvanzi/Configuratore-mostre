@@ -12,3 +12,11 @@
 @media(max-width:650px){.producer-credit{gap:10px;font-size:11px}.producer-credit img{width:145px}.producer-credit--compact{font-size:9px}.producer-credit--compact img{width:85px}.app-footer{flex-wrap:wrap;gap:8px}.app-footer .producer-credit{margin-left:auto}.app-footer .producer-credit>span{display:none}.account-producer{padding:22px 6%}}
 
 .visit-bottom .producer-credit{margin:0;gap:10px}.visit-bottom .producer-credit img{width:145px;padding:0;background:transparent;border-radius:0}.visit-bottom .producer-credit>span{display:none}
+
+/* The credit belongs to the footer edge, without a white badge. */
+.producer-credit img{background:transparent;padding:0;border-radius:0;mix-blend-mode:multiply;object-fit:contain}
+.site-footer .producer-credit,.template-page>footer .producer-credit{width:auto;flex-basis:auto;margin-left:auto;padding:0;border:0;justify-content:flex-end}
+.account-producer{display:flex;justify-content:flex-end;padding-top:28px;padding-bottom:28px}
+.template-page>footer{align-items:center;padding-top:30px;padding-bottom:30px;gap:20px 32px}
+.site-footer .producer-credit{order:5}
+@media(max-width:700px){.site-footer .producer-credit,.template-page>footer .producer-credit{align-self:flex-end;flex-basis:100%;justify-content:flex-end;padding-top:14px}.producer-credit img{width:150px}}

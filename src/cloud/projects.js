@@ -12,7 +12,7 @@ export async function requireUser() {
 export async function listProjects() {
   await requireUser();
   if (localAccountEnabled) return localRequest('projects');
-  const {data, error} = await cloud.from('projects').select('id,name,updated_at,revision,asset_count,width,depth,object_count').order('updated_at', {ascending: false});
+  const {data, error} = await cloud.from('projects').select('id,name,updated_at,revision,asset_count,width,depth,object_count,archive:document->archive').order('updated_at', {ascending: false});
   if (error) throw error;
   return data;
 }
@@ -53,4 +53,17 @@ export async function saveProject(project, binding, progress = () => {}) {
   });
   if (error) throw error;
   return {id, owner: user.id, revision: data};
+}
+
+// Card edits use the same revision-checked save as the editor, preserving every asset.
+export async function editProjectCard(id, patch) {
+  const loaded = await loadProject(id);
+  if (patch.name !== undefined) {
+    const name = String(patch.name).trim();
+    if (!name || name.length > 200) throw Error('Spazio: Inserisci un titolo da 1 a 200 caratteri.');
+    loaded.project.name = name;
+  }
+  loaded.project.archive = {...loaded.project.archive};
+  for (const key of ['cover', 'trashed']) if (patch[key] !== undefined) loaded.project.archive[key] = patch[key];
+  return saveProject(loaded.project, loaded);
 }

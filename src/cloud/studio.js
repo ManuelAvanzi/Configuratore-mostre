@@ -108,11 +108,11 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
           replaceProject(loaded.project, key);
           binding = loaded; cloudProjectLocalId = loaded.project.id; savedRevision = restore ? -1 : changes;
           status.textContent = restore ? 'Modifiche recuperate · da salvare nell’account' : 'Versione nell’account aperta';
-          locked = false; dialog.close(); await cacheCloud(key); return;
+          locked = false; dialog.close(); await cacheCloud(key); return true;
         }
         replaceProject(loaded.project, key);
         binding = loaded; cloudProjectLocalId = loaded.project.id; savedRevision = changes;
-        status.textContent = 'Versione nell’account aperta'; locked = false; dialog.close();
+        status.textContent = 'Versione nell’account aperta'; locked = false; dialog.close(); return true;
       } catch (error) {
         // Keep the editor covered after a failed open, so its demo cannot be mistaken for the user's project.
         show('<h2>Progetto non aperto</h2><p id="cloud-feedback" role="alert"></p><a class="cloud-link" href="/account">Torna ai miei progetti →</a>');
