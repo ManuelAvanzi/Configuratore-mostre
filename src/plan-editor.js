@@ -26,7 +26,7 @@ export function createPlanEditor(canvas,api){
   const line=(a,b,color='#dbe1dc',weight=1,dash=[])=>{a=to(a);b=to(b);c.strokeStyle=color;c.lineWidth=weight;c.setLineDash(dash);c.beginPath();c.moveTo(a.x,a.z);c.lineTo(b.x,b.z);c.stroke();c.setLineDash([]);};
   const label=(q,text,color='#53675a')=>{q=to(q);c.font='12px "DM Sans", Arial';const tw=c.measureText(text).width;c.fillStyle='#fafcf8ed';c.fillRect(q.x-tw/2-5,q.z-10,tw+10,20);c.fillStyle=color;c.textAlign='center';c.textBaseline='middle';c.fillText(text,q.x,q.z);};
   c.fillStyle='#edf0ec';c.fillRect(0,0,width,height);const corner=to({x:-p.width/2,z:-p.depth/2});c.fillStyle='#fafbf7';c.beginPath();floorOutline(p).map(to).forEach((q,i)=>i?c.lineTo(q.x,q.z):c.moveTo(q.x,q.z));c.closePath();c.fill();if(api.selected()==='surface:floor'){c.strokeStyle='#df7900';c.lineWidth=5;c.stroke();}
-  if(p.reference){if(reference?.src!==p.reference.src){reference={src:p.reference.src,img:new Image()};reference.img.onload=draw;reference.img.src=p.reference.src;}if(reference.img.complete&&reference.img.naturalWidth){const dimensions=api.referenceDimensions?.()??p.reference,q=to({x:-dimensions.width/2,z:-dimensions.depth/2});c.globalAlpha=api.referenceOpacity?.()??p.reference.opacity??.38;c.drawImage(reference.img,q.x,q.z,dimensions.width*scale,dimensions.depth*scale);c.globalAlpha=1;}}else reference=null;
+  if(p.reference){if(reference?.src!==p.reference.src){reference={src:p.reference.src,img:new Image()};reference.img.onload=draw;reference.img.src=p.reference.src;}if(reference.img.complete&&reference.img.naturalWidth){const dimensions=drag?.reference&&drag.next?drag.next:api.referenceDimensions?.()??p.reference,q=to({x:-dimensions.width/2,z:-dimensions.depth/2});c.globalAlpha=api.referenceOpacity?.()??p.reference.opacity??.38;c.drawImage(reference.img,q.x,q.z,dimensions.width*scale,dimensions.depth*scale);c.globalAlpha=1;}}else reference=null;
   const step=1;
   const left=-width/2/scale-pan.x,right=width/2/scale-pan.x,top=-height/2/scale-pan.z,bottom=height/2/scale-pan.z;
   for(let x=Math.ceil(left/step)*step;x<=right;x+=step)line({x,z:top},{x,z:bottom});
@@ -34,6 +34,13 @@ export function createPlanEditor(canvas,api){
   line({x:left,z:0},{x:right,z:0},'#bac9be',1,[4,4]);line({x:0,z:top},{x:0,z:bottom},'#bac9be',1,[4,4]);
   for(const original of p.walls){const w=preview(original);line({x:w.ax,z:w.az},{x:w.bx,z:w.bz},w.id===api.selected()?'#df7900':'#3e5147',Math.max(2,w.thickness*scale)+(w.id===api.selected()?4:0));for(const o of w.openings){const length=wallLength(w),dx=(w.bx-w.ax)/length,dz=(w.bz-w.az)/length,a={x:w.ax+dx*o.offset,z:w.az+dz*o.offset},b={x:a.x+dx*o.width,z:a.z+dz*o.width};line(a,b,o.type==='window'?'#8cb8c7':'#fafbf7',w.thickness*scale+2);if(o.id===api.selected()){line(a,b,'#fff',w.thickness*scale+9);line(a,b,'#df7900',w.thickness*scale+5);}else line(a,b,'#8a9e94',1,[3,3]);}label({x:(w.ax+w.bx)/2,z:(w.az+w.bz)/2-18/scale},wallLength(w).toFixed(2)+' m');}
   [...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).forEach((original,index)=>{const o=drag?.id===original.id&&drag.next?{...original,...drag.next}:original;const corners=footprint(o).map(to);c.beginPath();corners.forEach((q,i)=>i?c.lineTo(q.x,q.z):c.moveTo(q.x,q.z));c.closePath();c.fillStyle=o.color;c.globalAlpha=o.type==='floor-area'?.25:.8;c.fill();c.globalAlpha=1;c.lineWidth=(api.isSelected?.(o.id)??o.id===api.selected())?4:1;c.strokeStyle=(api.isSelected?.(o.id)??o.id===api.selected())?'#df7900':'#6b8173';c.stroke();if(Math.max(o.w,o.d)*scale>23)label({x:o.x,z:o.z},String(index+1));});
+  if(p.reference&&api.selected()==='reference:plan'&&api.tool()==='select'){
+   const ref=drag?.reference&&drag.next?drag.next:api.referenceDimensions?.()??p.reference;
+   const a=to({x:-ref.width/2,z:-ref.depth/2}),b=to({x:ref.width/2,z:ref.depth/2});
+   c.strokeStyle='#df7900';c.lineWidth=3;c.strokeRect(a.x,a.z,b.x-a.x,b.z-a.z);
+   for(const q of [{x:a.x,z:a.z},{x:b.x,z:a.z},{x:b.x,z:b.z},{x:a.x,z:b.z}]){c.fillStyle='#fff';c.fillRect(q.x-7,q.z-7,14,14);c.strokeRect(q.x-7,q.z-7,14,14);}
+   label({x:0,z:ref.depth/2+22/scale},`${ref.width.toFixed(2)} × ${ref.depth.toFixed(2)} m · trascina un angolo`,'#975300');
+  }
   const selected=selectedItem();
   if(selected&&api.tool()==='select'){
    const q=to(center(preview(selected)));
@@ -76,6 +83,11 @@ export function createPlanEditor(canvas,api){
   if(e.button===1||e.button===2||e.altKey){e.preventDefault();panning={x:e.clientX,y:e.clientY,pan:{...pan}};canvas.setPointerCapture(e.pointerId);return;}
   const p=api.project(),raw=point(e),q=snap(raw),tool=api.tool();cursor=q;
   if(tool==='floor-area'){if(!start){start=q;api.notify('Indica l’angolo opposto della superficie.');draw();return;}const w=round(Math.abs(q.x-start.x)),d=round(Math.abs(q.z-start.z));if(w<.1||d<.1)return;const o={...item('floor-area',(q.x+start.x)/2,(q.z+start.z)/2),w,d};apply(p=>p.objects.push(o));start=null;api.select(o.id);draw();return;}
+  if(tool==='select'&&p.reference&&api.selected()==='reference:plan'){
+   const ref=p.reference;
+   const corner=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,z])=>({x:x*ref.width/2,z:z*ref.depth/2})).find(q=>Math.hypot(raw.x-q.x,raw.z-q.z)*scale<16);
+   if(corner){drag={reference:true,original:{width:ref.width,depth:ref.depth},pointer:corner,screen:{x:e.clientX,y:e.clientY},moved:false};canvas.setPointerCapture(e.pointerId);return;}
+  }
   const chosen=selectedItem();
   if(tool==='select'&&chosen){
    const c=center(chosen),dx=(raw.x-c.x)*scale,dz=(raw.z-c.z)*scale,operation=api.transform?.()||'move';let axis=null;
@@ -98,13 +110,18 @@ export function createPlanEditor(canvas,api){
    if(!openingFits(w,o)){api.notify('L’apertura non entra o si sovrappone a un’altra.');return;}apply(()=>w.openings.push(o));api.select(o.id);return;
   }
   const opening=nearest?.distance<.3?nearest.w.openings.find(o=>nearest.offset>=o.offset&&nearest.offset<=o.offset+o.width):null;if(opening){api.select(opening.id);return;}
-  const obj=[...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).reverse().find(o=>containsPoint(o,raw.x,raw.z,3/scale));api.select(obj?.id||(nearest?.distance<.3?nearest.w.id:null),undefined,e.shiftKey);
+  const obj=[...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).reverse().find(o=>containsPoint(o,raw.x,raw.z,3/scale));api.select(obj?.id||(nearest?.distance<.3?nearest.w.id:p.reference&&Math.abs(raw.x)<=p.reference.width/2&&Math.abs(raw.z)<=p.reference.depth/2?'reference:plan':null),undefined,e.shiftKey);
   if(obj&&!e.shiftKey&&!api.multiple?.()&&(!api.transform||api.transform()==='move')){drag={id:obj.id,origin:{x:obj.x,z:obj.z},pointer:raw,screen:{x:e.clientX,y:e.clientY},moved:false};canvas.setPointerCapture(e.pointerId);}
  });
  canvas.addEventListener('pointermove',e=>{
   if(panning){pan={x:panning.pan.x+(e.clientX-panning.x)/scale,z:panning.pan.z+(e.clientY-panning.y)/scale};scheduleDraw();return;}
   if(!drag&&!['wall','measure','floor-area'].includes(api.tool()))return;
   const raw=point(e);cursor=drag?raw:snap(raw);
+  if(drag?.reference){
+   if(!drag.moved&&Math.hypot(e.clientX-drag.screen.x,e.clientY-drag.screen.y)<4)return;
+   const ref=drag.original,ratio=Math.max(.1/Math.min(ref.width,ref.depth),Math.min(200/Math.max(ref.width,ref.depth),(raw.x*drag.pointer.x+raw.z*drag.pointer.z)/(drag.pointer.x**2+drag.pointer.z**2)));
+   drag.next={width:ref.width*ratio,depth:ref.depth*ratio};drag.moved=true;scheduleDraw();return;
+  }
   if(drag&&['rotate','scale'].includes(drag.axis)){
    if(!drag.moved&&Math.hypot(e.clientX-drag.screen.x,e.clientY-drag.screen.y)<4)return;
    const next=structuredClone(drag.original);
@@ -125,7 +142,7 @@ export function createPlanEditor(canvas,api){
   if(drag){if(!drag.moved&&Math.hypot(e.clientX-drag.screen.x,e.clientY-drag.screen.y)<4)return;drag.moved=true;const q={x:drag.origin.x+raw.x-drag.pointer.x,z:drag.origin.z+raw.z-drag.pointer.z};if(drag.axis==='x')q.z=drag.origin.z;if(drag.axis==='z')q.x=drag.origin.x;drag.next={x:api.snap()?Math.round(q.x*10)/10:round(q.x),z:api.snap()?Math.round(q.z*10)/10:round(q.z)};if(drag.axis==='x')drag.next.z=drag.origin.z;if(drag.axis==='z')drag.next.x=drag.origin.x;if(drag.wall){const dx=drag.next.x-drag.origin.x,dz=drag.next.z-drag.origin.z;drag.next={ax:round(drag.original.ax+dx),az:round(drag.original.az+dz),bx:round(drag.original.bx+dx),bz:round(drag.original.bz+dz)};}}
   scheduleDraw();
  });
- function endDrag(cancel=false){if(panning){panning=null;return;}if(!drag)return;const current=drag;drag=null;const o=(current.wall?api.project().walls:api.project().objects).find(o=>o.id===current.id);if(!o)return;if(current.moved&&!cancel)apply(()=>Object.assign(o,current.next));draw();}
+ function endDrag(cancel=false){if(panning){panning=null;return;}if(!drag)return;const current=drag;drag=null;if(current.reference){if(current.moved&&!cancel)apply(p=>Object.assign(p.reference,current.next));draw();return;}const o=(current.wall?api.project().walls:api.project().objects).find(o=>o.id===current.id);if(!o)return;if(current.moved&&!cancel)apply(()=>Object.assign(o,current.next));draw();}
  canvas.addEventListener('pointerup',()=>endDrag());canvas.addEventListener('pointercancel',()=>endDrag(true));
  return {draw,cancel(){endDrag(true);measurement=null;start=null;cursor=null;draw();},fit(){pan={x:0,z:0};draw();}};
 }

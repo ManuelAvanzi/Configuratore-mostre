@@ -155,3 +155,5 @@
 .project-start-options{grid-template-columns:repeat(3,minmax(0,1fr))}.project-start-options>button{padding:20px 14px}.project-start-options b{font-size:17px}.project-start-options p{font-size:13px}
 #reference-controls{width:248px}#reference-controls label{display:grid;grid-template-columns:1fr auto;gap:5px}#reference-controls input{grid-column:1;width:100%;padding:0}#reference-controls output{grid-column:2;grid-row:2;font-size:12px}#reference-controls small{display:block;font-size:11px;line-height:1.4;color:#657466;margin:6px 0 10px}
 @media(max-width:600px){.project-start-options{grid-template-columns:1fr}.project-start-options>button{gap:8px}#reference-controls{right:10px;width:205px}}
+
+#reference-controls>button{margin-bottom:10px;font-size:12px;padding:7px}.reference-size-actions{display:flex;gap:8px;margin:16px 0}.reference-size-actions button{flex:1;padding:9px 6px;font-size:12px}
