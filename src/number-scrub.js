@@ -25,7 +25,7 @@ document.addEventListener('pointermove',e=>{
  g.input.value=clamp(g.input,g.value+steps*g.step);
  g.input.dispatchEvent(new Event('input',{bubbles:true}));
 });
-function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;document.body.classList.remove('scrubbing-number');if(cancel)g.input.value=g.start;else if(g.input.value!==g.start)g.input.dispatchEvent(new Event('change',{bubbles:true}));}
+function finish(cancel=false){if(!gesture)return;const g=gesture;gesture=null;document.body.classList.remove('scrubbing-number');if(cancel){g.input.value=g.start;g.input.dispatchEvent(new Event('scrubcancel',{bubbles:true}));}else if(g.input.value!==g.start)g.input.dispatchEvent(new Event('change',{bubbles:true}));}
 document.addEventListener('pointerup',()=>finish());
 document.addEventListener('pointercancel',()=>finish(true));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&gesture){e.preventDefault();e.stopImmediatePropagation();finish(true);}},true);
