@@ -26,7 +26,7 @@
  .hide-properties .workspace{grid-template-columns:244px minmax(300px,1fr)}
  .hide-library.hide-properties .workspace{grid-template-columns:minmax(300px,1fr)}
  .topbar{height:62px}.brand{min-width:189px;font-size:27px}
- .workflow{height:46px}.app-footer{height:28px;min-height:28px}
+ .workflow{height:46px}
  .panel-top{padding:17px 16px 15px}.panel-top h2{font-size:18px}
  .panel-top .eyebrow{font-size:9px}.panel-top p{line-height:1.65}
  .side-section{padding:17px 16px}
@@ -117,3 +117,11 @@
 .object-material{border-bottom:1px solid #dce4d9}.object-material>summary{padding:18px 16px;cursor:pointer;font-weight:600;color:#365747}.model-choice select{margin:8px 0 14px}.surface-panel>[data-action=texture]{margin-top:16px}
 
 .general-light{display:flex;align-items:center;gap:6px;padding:5px 8px;border-left:1px solid #dce4d9;color:#58705f;font-size:11px}.general-light svg{width:15px;height:15px}.general-light input{width:88px;height:18px;accent-color:#688463;cursor:pointer}@media(max-width:650px){.general-light>span{display:none}.general-light input{width:65px}}
+
+/* Give the producer credit its own breathing room at every workspace width. */
+.app-footer{height:auto;min-height:58px;padding:12px 24px;gap:12px 24px;flex-wrap:wrap;line-height:1.5;color:#637369}
+.app-footer .producer-credit{margin:0 0 0 auto;gap:12px;font-size:10px;flex-shrink:0}
+.app-footer .producer-credit img{width:128px;height:auto;max-width:none;flex-shrink:0;padding:0;object-fit:contain;background:transparent;border-radius:0}
+.app-footer .producer-credit>span{display:inline}
+.app-footer button,.app-footer>a{flex-shrink:0}
+@media(max-width:650px){.app-footer{padding:12px 16px;gap:12px 16px}.app-footer .producer-credit{order:2;flex-basis:100%;justify-content:center;padding-top:10px;border-top:1px solid var(--line)}.app-footer .producer-credit img{width:132px}}

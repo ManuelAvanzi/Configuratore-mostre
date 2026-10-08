@@ -26,7 +26,7 @@ export const catalog=[
  {type:'scenery',name:'Elemento scenografico',icon:'shapes',category:'Strutture',w:1,h:1,d:1,y:0,color:'#af6648'},
  {type:'column',name:'Colonna',icon:'columns-2',category:'Architettura',w:.4,h:3.2,d:.4,y:0,color:'#efeee9'},
 ];
-export function item(type,x=0,z=0){const c=catalog.find(c=>c.type===(legacyPeople[type]||type))||catalog[0];return {...c,id:uid(),x,z,rotation:0,text:c.type==='panel'?'Titolo della mostra\nUna storia da raccontare.':c.type==='sign'?'Percorso →':'',intensity:8};}
+export function item(type,x=0,z=0){const c=catalog.find(c=>c.type===(legacyPeople[type]||type))||catalog[0];return {...c,id:uid(),x,z,rotation:0,text:c.type==='panel'?'Titolo della mostra\nTema, opere e contesto storico.':c.type==='sign'?'Percorso →':'',intensity:8};}
 export function rectangle(w,d){return [[-w/2,-d/2,w/2,-d/2],[w/2,-d/2,w/2,d/2],[w/2,d/2,-w/2,d/2],[-w/2,d/2,-w/2,-d/2]].map(([ax,az,bx,bz])=>({id:uid(),ax,az,bx,bz,thickness:.15,height:3.2,openings:[]}));}
 export function createProject(w=12,d=9,name='La mia mostra'){return {version:1,id:uid(),name,width:w,depth:d,height:3.2,floor:'#d8d3c8',walls:rectangle(w,d),objects:[],reference:null,modified:new Date().toISOString()};}
 export function demo(){let p=createProject(14,10,'Forme in dialogo');let add=(t,x,z,props={})=>p.objects.push(Object.assign(item(t,x,z),props));
