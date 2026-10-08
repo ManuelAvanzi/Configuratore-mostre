@@ -27,10 +27,10 @@ export function createPlanEditor(canvas,api){
   const label=(q,text,color='#53675a')=>{q=to(q);c.font='12px "DM Sans", Arial';const tw=c.measureText(text).width;c.fillStyle='#fafcf8ed';c.fillRect(q.x-tw/2-5,q.z-10,tw+10,20);c.fillStyle=color;c.textAlign='center';c.textBaseline='middle';c.fillText(text,q.x,q.z);};
   c.fillStyle='#edf0ec';c.fillRect(0,0,width,height);const corner=to({x:-p.width/2,z:-p.depth/2});c.fillStyle='#fafbf7';c.beginPath();floorOutline(p).map(to).forEach((q,i)=>i?c.lineTo(q.x,q.z):c.moveTo(q.x,q.z));c.closePath();c.fill();if(api.selected()==='surface:floor'){c.strokeStyle='#df7900';c.lineWidth=5;c.stroke();}
   if(p.reference){if(reference?.src!==p.reference.src){reference={src:p.reference.src,img:new Image()};reference.img.onload=draw;reference.img.src=p.reference.src;}if(reference.img.complete&&reference.img.naturalWidth){const dimensions=drag?.reference&&drag.next?drag.next:api.referenceDimensions?.()??p.reference,q=to({x:-dimensions.width/2,z:-dimensions.depth/2});c.globalAlpha=api.referenceOpacity?.()??p.reference.opacity??.38;c.drawImage(reference.img,q.x,q.z,dimensions.width*scale,dimensions.depth*scale);c.globalAlpha=1;}}else reference=null;
-  const step=1;
+  const step=api.gridStep?.()||1;
   const left=-width/2/scale-pan.x,right=width/2/scale-pan.x,top=-height/2/scale-pan.z,bottom=height/2/scale-pan.z;
-  for(let x=Math.ceil(left/step)*step;x<=right;x+=step)line({x,z:top},{x,z:bottom});
-  for(let z=Math.ceil(top/step)*step;z<=bottom;z+=step)line({x:left,z},{x:right,z});
+  for(let x=Math.ceil(left/step)*step;x<=right;x+=step)line({x,z:top},{x,z:bottom},Math.abs(x-Math.round(x))<.001?'#c4cfc5':'#e0e6e0');
+  for(let z=Math.ceil(top/step)*step;z<=bottom;z+=step)line({x:left,z},{x:right,z},Math.abs(z-Math.round(z))<.001?'#c4cfc5':'#e0e6e0');
   line({x:left,z:0},{x:right,z:0},'#bac9be',1,[4,4]);line({x:0,z:top},{x:0,z:bottom},'#bac9be',1,[4,4]);
   for(const original of p.walls){const w=preview(original);line({x:w.ax,z:w.az},{x:w.bx,z:w.bz},w.id===api.selected()?'#df7900':'#3e5147',Math.max(2,w.thickness*scale)+(w.id===api.selected()?4:0));for(const o of w.openings){const length=wallLength(w),dx=(w.bx-w.ax)/length,dz=(w.bz-w.az)/length,a={x:w.ax+dx*o.offset,z:w.az+dz*o.offset},b={x:a.x+dx*o.width,z:a.z+dz*o.width};line(a,b,o.type==='window'?'#8cb8c7':'#fafbf7',w.thickness*scale+2);if(o.id===api.selected()){line(a,b,'#fff',w.thickness*scale+9);line(a,b,'#df7900',w.thickness*scale+5);}else line(a,b,'#8a9e94',1,[3,3]);}label({x:(w.ax+w.bx)/2,z:(w.az+w.bz)/2-18/scale},wallLength(w).toFixed(2)+' m');}
   [...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).forEach((original,index)=>{const o=drag?.id===original.id&&drag.next?{...original,...drag.next}:original;const corners=footprint(o).map(to);c.beginPath();corners.forEach((q,i)=>i?c.lineTo(q.x,q.z):c.moveTo(q.x,q.z));c.closePath();c.fillStyle=o.color;c.globalAlpha=o.type==='floor-area'?.25:.8;c.fill();c.globalAlpha=1;c.lineWidth=(api.isSelected?.(o.id)??o.id===api.selected())?4:1;c.strokeStyle=(api.isSelected?.(o.id)??o.id===api.selected())?'#df7900':'#6b8173';c.stroke();if(Math.max(o.w,o.d)*scale>23)label({x:o.x,z:o.z},String(index+1));});
@@ -63,8 +63,8 @@ export function createPlanEditor(canvas,api){
   if(measurement)dimension(measurement);
   if(start&&cursor&&api.tool()==='floor-area'){const a=to(start),b=to(cursor);c.fillStyle='#527d5826';c.fillRect(a.x,a.z,b.x-a.x,b.z-a.z);c.strokeStyle='#527d58';c.strokeRect(a.x,a.z,b.x-a.x,b.z-a.z);label({x:(start.x+cursor.x)/2,z:(start.z+cursor.z)/2},`${Math.abs(cursor.x-start.x).toFixed(2)} × ${Math.abs(cursor.z-start.z).toFixed(2)} m`);}
   if(start&&cursor&&api.tool()!=='floor-area'){const m={ax:start.x,az:start.z,bx:cursor.x,bz:cursor.z};dimension(m,true);}
-  if(cursor&&['measure','wall','floor-area'].includes(api.tool())){const q=to(cursor);c.strokeStyle='#256b85';c.lineWidth=1;c.beginPath();c.moveTo(q.x-7,q.z);c.lineTo(q.x+7,q.z);c.moveTo(q.x,q.z-7);c.lineTo(q.x,q.z+7);c.stroke();}
-  const readout=document.querySelector('#plan-readout');if(readout){readout.hidden=!start&&!measurement;readout.textContent=measurement&&!start?`${measureLength(measurement).toFixed(2)} m · Esc per cancellare`:start&&cursor?`${api.tool()==='measure'?'Misura':'Parete'} · ${Math.hypot(cursor.x-start.x,cursor.z-start.z).toFixed(2)} m · clic per terminare`:'';}
+  if(cursor&&['measure','wall','floor-area','calibrate'].includes(api.tool())){const q=to(cursor);c.strokeStyle='#256b85';c.lineWidth=1;c.beginPath();c.moveTo(q.x-7,q.z);c.lineTo(q.x+7,q.z);c.moveTo(q.x,q.z-7);c.lineTo(q.x,q.z+7);c.stroke();}
+  const readout=document.querySelector('#plan-readout');if(readout){readout.hidden=!start&&!measurement;readout.textContent=measurement&&!start?`${measureLength(measurement).toFixed(2)} m · Esc per cancellare`:start&&cursor?`${api.tool()==='calibrate'?'Calibrazione':api.tool()==='measure'?'Misura':'Parete'} · ${Math.hypot(cursor.x-start.x,cursor.z-start.z).toFixed(2)} m · clic per terminare`:'';}
  }
  function apply(change){try{api.change(change);}catch(error){api.notify(error.message);}}
  canvas.addEventListener('contextmenu',e=>e.preventDefault());
@@ -82,6 +82,13 @@ export function createPlanEditor(canvas,api){
  canvas.addEventListener('pointerdown',e=>{
   if(e.button===1||e.button===2||e.altKey){e.preventDefault();panning={x:e.clientX,y:e.clientY,pan:{...pan}};canvas.setPointerCapture(e.pointerId);return;}
   const p=api.project(),raw=point(e),q=snap(raw),tool=api.tool();cursor=q;
+  if(tool==='calibrate'){
+   if(!p.reference)return;
+   if(!start){start=raw;cursor=raw;api.notify('Ora indica il secondo estremo del lato.');draw();return;}
+   const distance=Math.hypot(raw.x-start.x,raw.z-start.z);
+   if(distance*scale<8){api.notify('Scegli due punti più distanti per una misura precisa.');return;}
+   measurement={ax:start.x,az:start.z,bx:raw.x,bz:raw.z};start=null;draw();api.calibrate(distance);return;
+  }
   if(tool==='floor-area'){if(!start){start=q;api.notify('Indica l’angolo opposto della superficie.');draw();return;}const w=round(Math.abs(q.x-start.x)),d=round(Math.abs(q.z-start.z));if(w<.1||d<.1)return;const o={...item('floor-area',(q.x+start.x)/2,(q.z+start.z)/2),w,d};apply(p=>p.objects.push(o));start=null;api.select(o.id);draw();return;}
   if(tool==='select'&&p.reference&&api.selected()==='reference:plan'){
    const ref=p.reference;
@@ -115,8 +122,8 @@ export function createPlanEditor(canvas,api){
  });
  canvas.addEventListener('pointermove',e=>{
   if(panning){pan={x:panning.pan.x+(e.clientX-panning.x)/scale,z:panning.pan.z+(e.clientY-panning.y)/scale};scheduleDraw();return;}
-  if(!drag&&!['wall','measure','floor-area'].includes(api.tool()))return;
-  const raw=point(e);cursor=drag?raw:snap(raw);
+  if(!drag&&!['wall','measure','floor-area','calibrate'].includes(api.tool()))return;
+  const raw=point(e);cursor=drag||api.tool()==='calibrate'?raw:snap(raw);
   if(drag?.reference){
    if(!drag.moved&&Math.hypot(e.clientX-drag.screen.x,e.clientY-drag.screen.y)<4)return;
    const ref=drag.original,ratio=Math.max(.1/Math.min(ref.width,ref.depth),Math.min(200/Math.max(ref.width,ref.depth),(raw.x*drag.pointer.x+raw.z*drag.pointer.z)/(drag.pointer.x**2+drag.pointer.z**2)));
