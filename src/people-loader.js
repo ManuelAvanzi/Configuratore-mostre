@@ -1,8 +1,9 @@
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 import * as T from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {personDefinition} from './people-catalog.js';
 const cache=new Map();
-const loader=new GLTFLoader();
+const loader=new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
 export function fitPerson(source,object,sourceBounds){
  const figure=source.clone(true);figure.updateMatrixWorld(true);
  const bounds=sourceBounds||new T.Box3().setFromObject(figure,true),size=bounds.getSize(new T.Vector3()),center=bounds.getCenter(new T.Vector3());
@@ -15,6 +16,6 @@ export function fitPerson(source,object,sourceBounds){
 }
 export async function createPerson(object){
  const def=personDefinition(object.type);if(!def)throw Error('Persona non disponibile nel catalogo.');
- if(!cache.has(def.type))cache.set(def.type,loader.loadAsync(`/people/models/${def.type}.glb`).then(gltf=>{gltf.scene.updateMatrixWorld(true);return {scene:gltf.scene,bounds:new T.Box3().setFromObject(gltf.scene,true)};}).catch(error=>{cache.delete(def.type);throw error;}));
+ if(!cache.has(def.type))cache.set(def.type,loader.loadAsync(`/people/models/${def.modelFile||def.type}.glb`).then(gltf=>{gltf.scene.updateMatrixWorld(true);return {scene:gltf.scene,bounds:new T.Box3().setFromObject(gltf.scene,true)};}).catch(error=>{cache.delete(def.type);throw error;}));
  const source=await cache.get(def.type);return fitPerson(source.scene,object,source.bounds);
 }

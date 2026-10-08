@@ -5,7 +5,7 @@ import {validate} from '../model.js';
 export function mountCloud({getProject, saveLocal, replaceProject, readDraft, cacheCloud, notify}) {
   let binding = null, savedRevision = -1, changes = 0, busy = false, locked = false, cloudProjectLocalId = null;
   const button = document.createElement('button');
-  button.id = 'cloud-save'; button.textContent = 'Salva online';
+  button.id = 'cloud-save'; button.textContent = 'Salva nel mio account';
   button.title = 'Conserva il progetto e i contenuti nel tuo account';
   document.querySelector('.top-actions').prepend(button);
   const link = document.createElement('a');
@@ -13,7 +13,7 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
   document.querySelector('.app-footer').append(link);
   const status = document.createElement('span'); status.id = 'cloud-state'; status.setAttribute('role','status');
   document.querySelector('.project-heading').append(status);
-  const dialog = document.createElement('dialog'); dialog.id = 'cloud-dialog'; dialog.setAttribute('aria-label','Salvataggio online'); document.body.append(dialog);
+  const dialog = document.createElement('dialog'); dialog.id = 'cloud-dialog'; dialog.setAttribute('aria-label','Salvataggio nell’account'); document.body.append(dialog);
   const close = () => {if (!busy && !locked) dialog.close();};
   function show(html) {
     dialog.innerHTML = `<button class="close-modal" id="close-cloud" aria-label="Chiudi">×</button>${html}`;
@@ -34,13 +34,13 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
       // A save belongs to the snapshot that started it, never to a newly opened project.
       if (getProject().id === snapshot.id) {
         binding = result; cloudProjectLocalId = snapshot.id; savedRevision = revision;
-        status.textContent = changes === revision ? 'Salvato online ✓' : 'Modifiche da salvare online';
+        status.textContent = changes === revision ? 'Salvato nell’account ✓' : 'Modifiche da salvare nell’account';
         await cacheCloud(`cloud:${binding.owner}:${binding.id}`);
         window.history.replaceState({}, '', `/studio?project=${encodeURIComponent(binding.id)}`);
       }
       dialog.close(); notify('Progetto e contenuti salvati nel tuo account.');
     } catch (error) {
-      status.textContent = 'Salvataggio online non riuscito';
+      status.textContent = 'Salvataggio nell’account non riuscito';
       dialog.querySelector('#cloud-feedback').textContent = message(error);
     } finally {
       busy = false; button.disabled = false; dialog.querySelectorAll('button').forEach(b => b.disabled = false);
@@ -48,18 +48,18 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
   }
   button.onclick = async () => {
     if (!cloudEnabled) {
-      show('<span class="eyebrow">IL TUO ARCHIVIO PERSONALE</span><h2>Salva le tue mostre online.</h2><p>Gli account devono ancora essere attivati. Per ora il progetto è conservato sul dispositivo: usa Esporta per avere una copia completa.</p><a class="cloud-link" href="/account">Scopri l’area personale ↗</a>'); return;
+      show('<span class="eyebrow">IL TUO ARCHIVIO PERSONALE</span><h2>Salva le tue mostre nell’account.</h2><p>Gli account devono ancora essere attivati. Per ora il progetto è conservato sul dispositivo: usa Esporta per avere una copia completa.</p><a class="cloud-link" href="/account">Scopri l’area personale ↗</a>'); return;
     }
     button.disabled = true;
     try {
       const user = await currentUser();
       if (!user) {
-        show('<h2>Accedi per salvare online</h2><p>Prima di accedere, conserveremo il progetto su questo dispositivo. Dopo l’accesso potrai riprenderlo e salvarlo nel tuo archivio.</p><button class="primary" id="cloud-login">Accedi o registrati →</button><p id="cloud-feedback" role="status"></p>');
+        show('<h2>Accedi per salvare nell’account</h2><p>Prima di accedere, conserveremo il progetto su questo dispositivo. Dopo l’accesso potrai riprenderlo e salvarlo nel tuo archivio.</p><button class="primary" id="cloud-login">Accedi o registrati →</button><p id="cloud-feedback" role="status"></p>');
         dialog.querySelector('#cloud-login').onclick = async () => {
           try {await saveLocal(); location.assign('/account');} catch (error) {dialog.querySelector('#cloud-feedback').textContent = error.message;}
         }; return;
       }
-      show(`<span class="eyebrow">ARCHIVIO PRIVATO</span><h2>${binding ? 'Salva le modifiche' : 'Aggiungi ai miei progetti'}</h2><p>Salva online l’allestimento con immagini, planimetrie, video e modelli caricati. Il salvataggio sul dispositivo resta automatico; quello online avviene con questo pulsante.</p><div class="cloud-buttons"><button class="primary" id="confirm-cloud">${binding ? 'Salva modifiche online' : 'Salva online'}</button>${binding ? '<button id="copy-cloud">Salva come nuovo progetto</button>' : ''}</div><p id="cloud-feedback" role="status"></p>`);
+      show(`<span class="eyebrow">ARCHIVIO PRIVATO</span><h2>${binding ? 'Salva le modifiche' : 'Aggiungi ai miei progetti'}</h2><p>Salva nel mio account l’allestimento con immagini, planimetrie, video e modelli caricati. Il salvataggio sul dispositivo resta automatico; quello nell’account avviene con questo pulsante.</p><div class="cloud-buttons"><button class="primary" id="confirm-cloud">${binding ? 'Salva modifiche' : 'Salva nel mio account'}</button>${binding ? '<button id="copy-cloud">Salva come nuovo progetto</button>' : ''}</div><p id="cloud-feedback" role="status"></p>`);
       dialog.querySelector('#confirm-cloud').onclick = () => save();
       dialog.querySelector('#copy-cloud')?.addEventListener('click', () => save(true));
     } catch (error) {notify(message(error));}
@@ -68,12 +68,12 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
   link.onclick = async event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    if (busy) {notify('Attendi il completamento del salvataggio online.'); return;}
+    if (busy) {notify('Attendi il completamento del salvataggio nell’account.'); return;}
     try {await saveLocal(); location.assign('/account');} catch (error) {notify(error.message);}
   };
   cloud?.auth.onAuthStateChange((event, session) => {
     if (binding && session?.user.id !== binding.owner && (event === 'SIGNED_OUT' || event === 'SIGNED_IN')) {
-      status.textContent = 'Accedi con il proprietario per salvare online';
+      status.textContent = 'Accedi con il proprietario per salvare nell’account';
     }
   });
   window.addEventListener('beforeunload', event => {
@@ -84,7 +84,7 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
     changed() {
       changes++;
       if (binding && getProject().id !== cloudProjectLocalId) {binding = null; status.textContent = '';}
-      else if (binding) status.textContent = 'Modifiche da salvare online';
+      else if (binding) status.textContent = 'Modifiche da salvare nell’account';
     },
     detach() {binding = null; cloudProjectLocalId = null; savedRevision = -1; status.textContent = '';},
     async open(id) {
@@ -92,13 +92,13 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
       show('<h2>Apertura del progetto…</h2><p>Recupero dell’allestimento e dei contenuti privati.</p>');
       dialog.querySelector('#close-cloud').hidden = true;
       try {
-        if (!cloudEnabled) throw Error('Spazio: Il servizio online deve ancora essere attivato.');
+        if (!cloudEnabled) throw Error('Spazio: Il servizio nell’account deve ancora essere attivato.');
         const loaded = await loadProject(id);
         const key = `cloud:${loaded.owner}:${loaded.id}`;
         const draft = await readDraft(key);
         if (draft?.cloud?.dirty && draft.cloud.owner === loaded.owner && draft.cloud.id === loaded.id) {
           busy = false;
-          show('<h2>Hai modifiche su questo dispositivo</h2><p>Questa copia contiene modifiche non ancora salvate online. Puoi recuperarle oppure aprire la versione online. Se il progetto online è cambiato, potrai salvare la bozza come nuovo progetto.</p><div class="cloud-buttons"><button class="primary" id="restore-draft">Recupera modifiche locali</button><button id="use-online">Apri versione online</button></div>');
+          show('<h2>Hai modifiche su questo dispositivo</h2><p>Questa copia contiene modifiche non ancora salvate nell’account. Puoi recuperarle oppure aprire la versione nell’account. Se il progetto nell’account è cambiato, potrai salvare la bozza come nuovo progetto.</p><div class="cloud-buttons"><button class="primary" id="restore-draft">Recupera modifiche locali</button><button id="use-online">Apri versione nell’account</button></div>');
           dialog.querySelector('#close-cloud').hidden = true;
           const restore = await new Promise(resolve => {
             dialog.querySelector('#restore-draft').onclick = () => resolve(true);
@@ -107,12 +107,12 @@ export function mountCloud({getProject, saveLocal, replaceProject, readDraft, ca
           if (restore) {loaded.project = validate(draft.project); loaded.revision = draft.cloud.revision;}
           replaceProject(loaded.project, key);
           binding = loaded; cloudProjectLocalId = loaded.project.id; savedRevision = restore ? -1 : changes;
-          status.textContent = restore ? 'Modifiche recuperate · da salvare online' : 'Versione online aperta';
+          status.textContent = restore ? 'Modifiche recuperate · da salvare nell’account' : 'Versione nell’account aperta';
           locked = false; dialog.close(); await cacheCloud(key); return;
         }
         replaceProject(loaded.project, key);
         binding = loaded; cloudProjectLocalId = loaded.project.id; savedRevision = changes;
-        status.textContent = 'Versione online aperta'; locked = false; dialog.close();
+        status.textContent = 'Versione nell’account aperta'; locked = false; dialog.close();
       } catch (error) {
         // Keep the editor covered after a failed open, so its demo cannot be mistaken for the user's project.
         show('<h2>Progetto non aperto</h2><p id="cloud-feedback" role="alert"></p><a class="cloud-link" href="/account">Torna ai miei progetti →</a>');

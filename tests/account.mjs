@@ -90,8 +90,8 @@ async function login(page,email) {
 try {
   const {page}=await context();
   await page.goto('http://localhost:5184/account');
-  await expect(page.getByText('Area online in preparazione')).toBeVisible();
-  assert.equal(await page.locator('input[type=password]').count(),0);
+  await expect(page.getByLabel('Nome utente')).toBeVisible();
+  assert.equal(await page.locator('input[type=password]').count(),1);
   await page.screenshot({path:'test-results/account-unconfigured.png',fullPage:true});
   await page.goto(origin+'/');await page.locator('.nav-actions [data-access]').click();
   await expect(page.locator('#auth-form')).toBeVisible();
@@ -107,7 +107,7 @@ try {
   await login(page,users[0].email);
   await expect(page.locator('.archive-empty')).toBeVisible();
   await page.locator('.archive-heading a').click();await page.locator('#new-form [name=name]').fill('Mostra account Alice');
-  await page.locator('#new-form button').click();
+  await page.locator('#new-form button[type=submit]').click();
   await page.locator('[data-mode=layout]').click();
   await page.locator('[data-action=image]').click();
   await page.locator('#file').setInputFiles({name:'opera.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==','base64')});
@@ -115,10 +115,10 @@ try {
   await page.locator('#cloud-save').click();failUploads=true;
   await page.locator('#confirm-cloud').click();await expect(page.locator('#cloud-state')).toContainText('non riuscito');
   assert.equal(projects.size,0,'Failed uploads cannot commit an incomplete project');
-  failUploads=false;await page.locator('#confirm-cloud').click();await expect(page.locator('#cloud-state')).toHaveText('Salvato online ✓');
+  failUploads=false;await page.locator('#confirm-cloud').click();await expect(page.locator('#cloud-state')).toHaveText('Salvato nell’account ✓');
   assert.equal(projects.size,1);assert.equal(assets.size,1);
   const {page:secondDevice}=await context();await login(secondDevice,users[0].email);
-  await secondDevice.locator('.project-card-body a').click();await expect(secondDevice.locator('#cloud-state')).toHaveText('Versione online aperta');
+  await secondDevice.locator('.project-card-body a').click();await expect(secondDevice.locator('#cloud-state')).toHaveText('Versione nell’account aperta');
   await expect(secondDevice.locator('#project-name')).toHaveValue('Mostra account Alice');
   await expect(secondDevice.locator('#count')).toHaveText('1 elementi');
   await secondDevice.setViewportSize({width:390,height:844});await secondDevice.screenshot({path:'test-results/account-editor-mobile.png'});
@@ -129,7 +129,7 @@ try {
   await page.setViewportSize({width:390,height:844});await page.screenshot({path:'test-results/account-dashboard-mobile.png',fullPage:true});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.setViewportSize({width:1440,height:1000});
-  await page.locator('.project-card-body a').click();await expect(page.locator('#cloud-state')).toHaveText('Versione online aperta');
+  await page.locator('.project-card-body a').click();await expect(page.locator('#cloud-state')).toHaveText('Versione nell’account aperta');
   await expect(page.locator('#project-name')).toHaveValue('Mostra account Alice');
   await expect(page.locator('#count')).toHaveText('1 elementi');
   await page.locator('#project-name').fill('Bozza recuperata');await page.locator('#project-name').press('Tab');
@@ -138,7 +138,7 @@ try {
   await expect(page.locator('#project-name')).toHaveValue('Bozza recuperata');
   await page.locator('#cloud-save').click();failSave=true;await page.locator('#confirm-cloud').click();
   await expect(page.locator('#cloud-feedback')).toContainText('aggiornato altrove');
-  failSave=false;await page.locator('#copy-cloud').click();await expect(page.locator('#cloud-state')).toHaveText('Salvato online ✓');
+  failSave=false;await page.locator('#copy-cloud').click();await expect(page.locator('#cloud-state')).toHaveText('Salvato nell’account ✓');
   assert.equal(projects.size,2);assert.equal(assets.size,1,'Content reused across project copies');
   await page.goto(origin+'/account?mode=recovery');await expect(page.locator('input[name=password]')).toBeVisible();
   await page.locator('input[name=password]').fill('new-valid-password-123');await page.locator('#auth-form button').click();
@@ -154,4 +154,4 @@ try {
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   assert.deepEqual(errors,[]);
   console.log('Account browser contracts: registration, invalid login, recovery, saving with assets, failed upload, reopen, draft recovery, conflict/copy, account isolation, logout, desktop/mobile OK.');
-} finally {await browser.close();await server.close();await offline.close();}
+} catch(error) {console.error('Browser errors:',errors);throw error;} finally {await browser.close();await server.close();await offline.close();}

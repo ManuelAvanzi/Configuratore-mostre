@@ -6,6 +6,8 @@ function slots(project) {
   return [
     ...(project.reference ? [[project.reference, 'src']] : []),
     ...project.objects.flatMap(object => ['image', 'video', 'model'].filter(key => object[key]).map(key => [object, key])),
+    ...[project.floorSurface, ...project.walls.flatMap(wall => [wall.surfaces?.a, wall.surfaces?.b]), ...project.objects.map(object => object.surface)]
+      .filter(surface => surface?.texture).map(surface => [surface, 'texture']),
   ];
 }
 

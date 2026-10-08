@@ -1,7 +1,7 @@
 import {chromium} from '@playwright/test';
 import fs from 'node:fs/promises';
 const browser=await chromium.launch({channel:'msedge',headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
-await page.goto('http://localhost:5173/studio');await page.locator('[data-action="new"]').click();await page.locator('[name="name"]').fill('Laboratorio di prova');await page.locator('[name="width"]').fill('20');await page.locator('[name="depth"]').fill('10');await page.locator('#new-form button').click();
+await page.goto('http://localhost:5173/studio');await page.locator('[data-action="new"]').click();await page.locator('[name="name"]').fill('Laboratorio di prova');await page.locator('[name="width"]').fill('20');await page.locator('[name="depth"]').fill('10');await page.locator('#new-form button[type=submit]').click();
 if(await page.locator('#area').textContent()!=='200 m²')throw Error('Area stanza errata');
 await page.locator('[data-action="reference"]').click();await page.locator('#file').setInputFiles('test-results/editor.png');await page.locator('[data-field="ref.width"]').waitFor();await page.locator('[data-field="ref.width"]').fill('20');await page.locator('[data-field="ref.width"]').press('Tab');
 await page.locator('.step[data-mode="layout"]').click();await page.locator('[data-action="image"]').click();await page.locator('#file').setInputFiles('test-results/editor.png');await page.locator('[data-text="name"]').waitFor();

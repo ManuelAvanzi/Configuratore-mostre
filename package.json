@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test tests/model.test.js tests/cloud.test.js tests/arrange.test.js tests/templates.test.js tests/sculptures.test.js tests/project-file.test.js",
+    "test": "node --test tests/model.test.js tests/cloud.test.js tests/arrange.test.js tests/templates.test.js tests/sculptures.test.js tests/project-file.test.js tests/transform-panel.test.js tests/exhibit-library.test.js",
     "test:account": "node tests/account.mjs"
   },
   "dependencies": {
@@ -17,7 +17,11 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.14",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
     "@playwright/test": "1.63.0",
+    "meshoptimizer": "^1.3.0",
     "sharp": "^0.35.4",
     "vite": "6.4.3"
   }

@@ -27,8 +27,9 @@ export function projectChecks(p){
   const o=p.objects[i];
   if(!footprintInFloor(p,footprint(o)))add(o.id,'Fuori dal pavimento',o.name);
   if(o.y<-.005||o.y+o.h>p.height+.005)add(o.id,'Quota fuori ambiente',`${o.name} · sommità ${round(o.y+o.h)} m`);
+  if(o.type==='floor-area')continue;
   const wall=solids.find(w=>volumesOverlap(o,w));if(wall)add(o.id,'Intersezione con parete',`${o.name} · ${wall.label}`);
-  for(let j=i+1;j<p.objects.length&&issues.length<100;j++)if(volumesOverlap(o,p.objects[j]))add(o.id,'Ingombri sovrapposti',`${o.name} / ${p.objects[j].name}`);
+  for(let j=i+1;j<p.objects.length&&issues.length<100;j++)if(p.objects[j].type!=='floor-area'&&volumesOverlap(o,p.objects[j]))add(o.id,'Ingombri sovrapposti',`${o.name} / ${p.objects[j].name}`);
  }
  return issues;
 }

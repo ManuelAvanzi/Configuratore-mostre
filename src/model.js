@@ -1,11 +1,14 @@
+import {exhibitCatalog} from './exhibit-catalog.js';
 import {sculptureCatalog} from './sculpture-catalog.js';
 import {validateFloor,insideFloor} from './floor-plan.js';
 import {peopleCatalog,legacyPeople,migratePerson} from './people-catalog.js';
-import {validateSurface,FLOOR_ID,surfaceObjects} from './surfaces.js';
+import {validateSurface,FLOOR_ID,supportsSurface} from './surfaces.js';
 export const uid=()=>crypto.randomUUID();
 export const clone=x=>structuredClone(x);
 export const round=x=>Math.round(x*100)/100;
 export const catalog=[
+ ...exhibitCatalog,
+ {type:'floor-area',name:'Superficie pavimento',icon:'square-dashed',category:'Architettura',w:3,h:.02,d:3,y:0,color:'#c5bfae'},
  {type:'art',name:'Quadro / fotografia',icon:'image',category:'Opere',w:1.2,h:.8,d:.05,y:1.15,color:'#e8c88e'},
  {type:'sculpture',name:'Scultura',icon:'gem',category:'Opere',w:.6,h:1.2,d:.6,y:0,color:'#aa7554'},
  ...sculptureCatalog,
@@ -38,20 +41,23 @@ export const wallLength=w=>Math.hypot(w.bx-w.ax,w.bz-w.az);
 export function validateGLB(data){try{const binary=Uint8Array.from(atob(data.split(',')[1]),c=>c.charCodeAt(0));const v=new DataView(binary.buffer);if(v.byteLength<20||v.getUint32(0,true)!==0x46546c67||v.getUint32(4,true)!==2||v.getUint32(8,true)!==v.byteLength||v.getUint32(16,true)!==0x4e4f534a)throw Error();const length=v.getUint32(12,true);const json=JSON.parse(new TextDecoder().decode(binary.slice(20,20+length)));if([...(json.buffers||[]),...(json.images||[])].some(a=>a.uri&&!a.uri.startsWith('data:')))throw Error();if(json.extensionsRequired?.some(x=>['KHR_draco_mesh_compression','EXT_meshopt_compression','KHR_texture_basisu'].includes(x)))throw Error();return data;}catch{throw Error('Usa un GLB 2.0 non compresso, con tutte le risorse incorporate.');}}
 export function wallParts(w){const len=wallLength(w),out=[];let at=0;for(const o of [...w.openings].sort((a,b)=>a.offset-b.offset)){if(o.offset>at)out.push({start:at,end:o.offset,bottom:0,top:w.height});if(o.sill>0)out.push({start:o.offset,end:o.offset+o.width,bottom:0,top:o.sill});if(o.sill+o.height<w.height)out.push({start:o.offset,end:o.offset+o.width,bottom:o.sill+o.height,top:w.height});at=o.offset+o.width;}if(at<len)out.push({start:at,end:len,bottom:0,top:w.height});return out;}
 export function openingFits(w,o,exclude){return o.offset>=0&&o.width>=.2&&o.offset+o.width<=wallLength(w)+.001&&o.sill>=0&&o.height>=.2&&o.sill+o.height<=w.height+.001&&!w.openings.some(a=>a.id!==exclude&&o.offset<a.offset+a.width&&o.offset+o.width>a.offset);}
-export function validate(p){const n=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max; if(!p||p.version!==1||typeof p.name!=='string'||!n(p.width,2,100)||!n(p.depth,2,100)||!n(p.height,2,12)||!Array.isArray(p.walls)||!Array.isArray(p.objects)||p.walls.length>500||p.objects.length>500)throw Error('Il file non è un progetto Spazio valido.');
+export function validate(p){const n=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max; if(!p||p.version!==1||typeof p.name!=='string'||!n(p.width,2,100)||!n(p.depth,2,100)||!n(p.height,2,12)||!Array.isArray(p.walls)||!Array.isArray(p.objects)||p.walls.length>500||p.objects.length>500)throw Error('Il file non è un progetto exhibitionLab valido.');
  if(typeof p.id!=='string'||typeof p.floor!=='string'||!/^#[0-9a-f]{6}$/i.test(p.floor)||p.name.length>200)throw Error('Proprietà progetto non valide.');
  if(p.lighting&&(!n(p.lighting.ambient,0,3)||!n(p.lighting.daylight,0,3)||!n(p.lighting.environment,0,2)))throw Error('Illuminazione ambiente non valida.');
  for(const o of p.objects)if(o.type==='light'){if(o.intensity!==undefined&&!n(o.intensity,0,2000)||o.beamAngle!==undefined&&!n(o.beamAngle,5,120)||o.tilt!==undefined&&!n(o.tilt,0,90))throw Error('Parametri faro non validi.');}
+ for(const e of [...p.objects,...p.walls])if(e.transformScale!==undefined&&(!e.transformScale||!['x','y','z'].every(k=>n(e.transformScale[k],.000001,10000))))throw Error('Fattori di scala non validi.');
  validateSurface(p.floorSurface);
  for(const w of p.walls){if(w.surfaces!==undefined){if(!w.surfaces||typeof w.surfaces!=='object'||Array.isArray(w.surfaces))throw Error('Finiture parete non valide.');validateSurface(w.surfaces.a);validateSurface(w.surfaces.b);}}
- for(const o of p.objects){validateSurface(o.surface);if(o.surface&&!surfaceObjects.includes(o.type))throw Error('Questo elemento mantiene i propri materiali originali.');}
+ for(const o of p.objects){validateSurface(o.surface);if(o.surface&&!supportsSurface(o.type))throw Error('Questo elemento mantiene i propri materiali originali.');}
  const ids=new Set();const id=x=>{if(typeof x!=='string'||x===FLOOR_ID||ids.has(x))throw Error('Identificatori non validi.');ids.add(x)};
  if(p.measurements!==undefined){if(!Array.isArray(p.measurements)||p.measurements.length>200)throw Error('Massimo 200 quote per progetto.');for(const m of p.measurements){if(!m||!['ax','az','bx','bz'].every(k=>n(m[k],-100,100))||Math.hypot(m.bx-m.ax,m.bz-m.az)<.1)throw Error('Quota non valida: indica due punti distanti almeno 10 cm.');id(m.id);}}
  for(const w of p.walls){id(w.id);if(!['ax','az','bx','bz'].every(k=>n(w[k],-100,100))||!n(w.height,.2,12)||!n(w.thickness,.03,2)||wallLength(w)<.1||!Array.isArray(w.openings))throw Error('Parete non valida.');for(const o of w.openings){id(o.id);if(!['door','window','opening'].includes(o.type)||!['offset','width','height','sill'].every(k=>n(o[k],0,200))||!openingFits(w,o,o.id))throw Error('Aperture sovrapposte o fuori parete.');}}
  validateFloor(p);
  for(const o of p.objects){id(o.id);if(![...catalog.map(c=>c.type),...Object.keys(legacyPeople),'model'].includes(o.type)||typeof o.name!=='string'||!['w','h','d'].every(k=>n(o[k],.01,100))||!['x','z','y','rotation'].every(k=>n(o[k],-360,360))||typeof o.color!=='string'||!/^#[0-9a-f]{6}$/i.test(o.color))throw Error('Elemento non valido.');for(const k of ['image','video','model'])if(o[k]&&!(typeof o[k]==='string'&&o[k].startsWith('data:')))throw Error('Asset esterno non consentito.');migratePerson(o);}
  for(const o of p.objects){if(o.text!==undefined&&typeof o.text!=='string'||o.name.length>200)throw Error('Testo non valido.');if(o.image&&!/^data:image\/(png|jpeg|webp);base64,/.test(o.image))throw Error('Formato immagine non supportato.');if(o.video&&!/^data:video\/(mp4|webm);base64,/.test(o.video))throw Error('Formato video non supportato.');if(o.model)validateGLB(o.model);}
+ if(p.generalLight!==undefined&&!n(p.generalLight,0,2))throw Error('Illuminazione generale non valida.');
+ if(p.reference?.opacity!==undefined&&!n(p.reference.opacity,0,1))throw Error('Opacità non valida.');
  if(p.reference&&(!n(p.reference.width,.1,200)||!n(p.reference.depth,.1,200)||typeof p.reference.src!=='string'||!/^data:image\/(png|jpeg|webp);base64,/.test(p.reference.src)))throw Error('Riferimento non valido.');return p;}
 export function distanceToWall(x,z,w){const dx=w.bx-w.ax,dz=w.bz-w.az,t=Math.max(0,Math.min(1,((x-w.ax)*dx+(z-w.az)*dz)/(dx*dx+dz*dz)));return {distance:Math.hypot(x-w.ax-t*dx,z-w.az-t*dz),offset:t*wallLength(w)};}
-export function canWalk(p,x,z){if(!insideFloor(p,x,z,.2))return false;for(const w of p.walls){const a=distanceToWall(x,z,w);if(a.distance<w.thickness/2+.18&&!w.openings.some(o=>o.sill<.1&&o.height>1.7&&a.offset>o.offset+.18&&a.offset<o.offset+o.width-.18))return false;}return !p.objects.some(o=>{if(o.y>1.7||['art','sign','light','panel'].includes(o.type))return false;const r=o.rotation*Math.PI/180,dx=x-o.x,dz=z-o.z;return Math.abs(dx*Math.cos(r)-dz*Math.sin(r))<o.w/2+.18&&Math.abs(dx*Math.sin(r)+dz*Math.cos(r))<o.d/2+.18;});}
+export function canWalk(p,x,z){if(!insideFloor(p,x,z,.2))return false;for(const w of p.walls){const a=distanceToWall(x,z,w);if(a.distance<w.thickness/2+.18&&!w.openings.some(o=>o.sill<.1&&o.height>1.7&&a.offset>o.offset+.18&&a.offset<o.offset+o.width-.18))return false;}return !p.objects.some(o=>{if(o.y>1.7||['art','sign','light','panel','floor-area'].includes(o.type))return false;const r=o.rotation*Math.PI/180,dx=x-o.x,dz=z-o.z;return Math.abs(dx*Math.cos(r)-dz*Math.sin(r))<o.w/2+.18&&Math.abs(dx*Math.sin(r)+dz*Math.cos(r))<o.d/2+.18;});}
 

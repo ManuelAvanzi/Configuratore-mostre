@@ -1,0 +1,3 @@
+import * as T from 'three';import {GLTFExporter} from 'three/addons/exporters/GLTFExporter.js';import {createWheelchairPerson} from '../src/wheelchair-person.js';import fs from 'node:fs/promises';
+globalThis.FileReader=class{readAsArrayBuffer(blob){blob.arrayBuffer().then(data=>{this.result=data;this.onloadend?.();});}};
+const model=createWheelchairPerson();model.updateMatrixWorld(true);const size=new T.Box3().setFromObject(model).getSize(new T.Vector3());const binary=await new GLTFExporter().parseAsync(model,{binary:true});await fs.writeFile('public/people/models/person-wheelchair.glb',Buffer.from(binary));console.log(JSON.stringify({width:size.x,height:size.y,depth:size.z,widthRatio:size.x/size.y,depthRatio:size.z/size.y,bytes:binary.byteLength}));

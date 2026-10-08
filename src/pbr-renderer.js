@@ -1,3 +1,4 @@
+import {materialCanvas} from './procedural-materials.js';
 import * as T from 'three';
 import {surface,materials} from './surfaces.js';
 const sets=new Map(),pool=new Map(),used=new Set(),pending=new Set(),loader=new T.TextureLoader();
@@ -12,7 +13,7 @@ function loadSet(asset){
  sets.set(asset,entry);return entry.promise;
 }
 export function beginSurfaceBuild(){used.clear();}
-function dispose(m){for(const key of ['map','normalMap','roughnessMap'])m[key]?.dispose();m.dispose();}
+function dispose(m){for(const key of ['map','normalMap','roughnessMap','bumpMap'])m[key]?.dispose();m.dispose();}
 export function endSurfaceBuild(){
  for(const [key,m] of pool)if(!used.has(key)){dispose(m);pool.delete(key);}
  const active=new Set([...pool.values()].map(m=>m.userData.asset));
@@ -23,7 +24,9 @@ export function surfaceMaterial(value,color){
  const s=surface(value,color),def=materials.find(m=>m.id===s.material),key=JSON.stringify(s);used.add(key);if(pool.has(key))return pool.get(key);
  const m=new T.MeshStandardMaterial({color:s.color,roughness:{matte:1,satin:.65,gloss:.24}[s.finish],metalness:def.metalness||0,normalScale:new T.Vector2(...(['plaster','painted-plaster'].includes(s.material)?[.12,.12]:['stone','dark-marble'].includes(s.material)?[.18,.18]:[.28,.28]))});
  m.userData.surfaceManaged=true;m.userData.asset=def.asset;pool.set(key,m);
- if(def.asset)loadSet(def.asset).then(textures=>{if(pool.get(key)!==m)return;const [map,normalMap,roughnessMap]=textures.map(base=>{const texture=base.clone();texture.repeat.set(1/s.scale,1/(s.scale*(def.aspect||1)));texture.rotation=s.rotation*Math.PI/180;texture.needsUpdate=true;return texture;});Object.assign(m,{map,normalMap,roughnessMap});m.needsUpdate=true;}).catch(()=>{});
+ if(!s.texture&&def.procedural){const map=new T.CanvasTexture(materialCanvas(def.procedural));map.colorSpace=T.SRGBColorSpace;map.wrapS=map.wrapT=T.RepeatWrapping;map.repeat.set(1/s.scale,1/s.scale);map.rotation=s.rotation*Math.PI/180;map.anisotropy=anisotropy;m.map=map;m.bumpMap=map.clone();m.bumpMap.colorSpace=T.NoColorSpace;m.bumpScale=.003;}
+ if(!s.texture&&def.asset)loadSet(def.asset).then(textures=>{if(pool.get(key)!==m)return;const [map,normalMap,roughnessMap]=textures.map(base=>{const texture=base.clone();texture.repeat.set(1/s.scale,1/(s.scale*(def.aspect||1)));texture.rotation=s.rotation*Math.PI/180;texture.needsUpdate=true;return texture;});Object.assign(m,{map,normalMap,roughnessMap});m.needsUpdate=true;}).catch(()=>{});
+ if(s.texture){const texture=new T.TextureLoader().load(s.texture,()=>{pending.delete(key);status();},undefined,()=>{pending.delete(key);status();});pending.add(key);status();texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(1/s.scale,1/s.scale);texture.rotation=s.rotation*Math.PI/180;texture.anisotropy=anisotropy;m.map=texture;}
  return m;
 }
 export function surfaceUV(geometry,offset={x:0,y:0,z:0}){
@@ -33,5 +36,5 @@ export function surfaceUV(geometry,offset={x:0,y:0,z:0}){
 export function surfacePreview(canvas,s){
  const ctx=canvas.getContext('2d');canvas.width=480;canvas.height=220;const token=JSON.stringify(s);canvas.dataset.surface=token;
  function draw(img){if(!canvas.isConnected||canvas.dataset.surface!==token)return;ctx.fillStyle='#fff';ctx.fillRect(0,0,480,220);if(img){ctx.save();ctx.translate(240,110);ctx.rotate(-s.rotation*Math.PI/180);ctx.drawImage(img,-280,-280,560,560);ctx.restore();}ctx.globalCompositeOperation='multiply';ctx.fillStyle=s.color;ctx.fillRect(0,0,480,220);ctx.globalCompositeOperation='source-over';}
- draw();const asset=materials.find(m=>m.id===s.material)?.asset;if(asset){const img=new Image();img.onload=()=>draw(img);img.src=`/materials/${asset}/preview.webp`;}
+ const procedural=materials.find(m=>m.id===s.material)?.procedural;draw(procedural?materialCanvas(procedural):null);if(s.texture){const img=new Image();img.onload=()=>draw(img);img.src=s.texture;return;}const asset=materials.find(m=>m.id===s.material)?.asset;if(asset){const img=new Image();img.onload=()=>draw(img);img.src=`/materials/${asset}/preview.webp`;}
 }

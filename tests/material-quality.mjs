@@ -10,7 +10,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true});const page
 page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});page.on('request',r=>{if(/\/materials\/.*\/(color|normal|roughness)\.webp/.test(r.url()))requests.set(r.url(),(requests.get(r.url())||0)+1);});
 const ready=()=>page.locator('#scene[data-loading-materials="0"]').waitFor({timeout:30000});
 try{
- await page.goto(base+'/studio?start=new');await page.locator('[name=name]').fill('Campioni materiali HD');await page.locator('#new-form button').click();await page.locator('[data-mode=layout]').click();await page.locator('[data-select="surface:floor"]').first().click();await page.locator('[data-action=grid]').click();
+ await page.goto(base+'/studio?start=new');await page.locator('[name=name]').fill('Campioni materiali HD');await page.locator('#new-form button[type=submit]').click();await page.locator('[data-mode=layout]').click();await page.locator('[data-select="surface:floor"]').first().click();await page.locator('[data-action=grid]').click();
  assert.equal(await page.locator('[data-material]').count(),20);
  await page.locator('#material-category').selectOption('Legni');assert.equal(await page.locator('[data-material]:visible').count(),4);await page.locator('[data-material=oak]').click();await ready();await page.screenshot({path:'test-results/materials-hd-parquet.png'});
  await page.locator('#material-category').selectOption('Tutti');

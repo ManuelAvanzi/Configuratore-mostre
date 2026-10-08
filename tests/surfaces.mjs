@@ -9,7 +9,7 @@ await fs.mkdir('test-results',{recursive:true});
 async function clickPoint(x,y,z){const r=await page.locator('#scene canvas').boundingBox();const camera=new PerspectiveCamera(45,r.width/r.height,.05,400);camera.position.set(13.2,12,13.5);camera.lookAt(0,0,0);camera.updateMatrixWorld();const v=new Vector3(x,y,z).project(camera);await page.mouse.click(r.x+(v.x+1)*r.width/2,r.y+(1-v.y)*r.height/2);}
 async function change(field,value){const input=page.locator(`[data-surface-field=${field}]`).last();await input.fill(String(value));await input.press('Tab');}
 try{
- await page.goto(base+'/studio?start=new');await page.locator('[name=name]').fill('Materiali e colori');await page.locator('#new-form button').click();await page.locator('[data-mode=layout]').click();
+ await page.goto(base+'/studio?start=new');await page.locator('[name=name]').fill('Materiali e colori');await page.locator('#new-form button[type=submit]').click();await page.locator('[data-mode=layout]').click();
  await clickPoint(0,0,0);assert.equal(await page.locator('#properties h2').textContent(),'Pavimento');
  for(const kind of ['plaster','concrete','resin','carpet','stone','metal','oak']){await page.locator(`[data-material=${kind}]`).click();assert.equal(await page.locator(`[data-material=${kind}]`).getAttribute('aria-pressed'),'true');}
  await change('scale',.25);await change('rotation',90);await page.locator('[data-surface-field=finish]').selectOption('satin');await page.locator('[data-action=grid]').click();

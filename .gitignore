@@ -14,3 +14,8 @@ assets/materials/downloads/
 assets/materials/contact-sheet.png
 .DS_Store
 Thumbs.db
+
+# Build temporanea per file di preview bloccati da Windows.
+dist-next/
+
+.local-data/

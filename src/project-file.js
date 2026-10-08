@@ -7,7 +7,7 @@ export function projectFromGLB(buffer){
  if(view.getUint32(16,true)!==0x4e4f534a||length%4||20+length>buffer.byteLength)throw Error('Dati GLB non validi.');
  const json=JSON.parse(new TextDecoder().decode(new Uint8Array(buffer,20,length)));
  const metadata=json.scenes?.[json.scene??0]?.extras?.spazio;
- if(!metadata)throw Error('Questo GLB non contiene un progetto Spazio modificabile. Puoi aggiungerlo come singolo modello 3D dal catalogo.');
+ if(!metadata)throw Error('Questo GLB non contiene un progetto exhibitionLab modificabile. Puoi aggiungerlo come singolo modello 3D dal catalogo.');
  if(metadata.version!==1)throw Error('Versione del progetto GLB non supportata.');
  return validate(metadata.project);
 }

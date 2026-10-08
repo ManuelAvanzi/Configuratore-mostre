@@ -1,0 +1,92 @@
+/* Compact educational sections below the full-width slider. */
+.landing-page{background:#fafbf8;color:#273d34}
+.landing-page .site-header{height:76px;max-width:1280px;padding:0 32px;gap:28px}
+.landing-page .logo{font-size:25px;letter-spacing:-1px;padding:0;gap:8px}
+.landing-page .logo svg{width:26px;height:26px}
+.landing-page .site-header nav{gap:24px}
+.landing-page .nav-actions{gap:16px;font-size:14px}
+.education-hero,.education-start,.education-how{max-width:1280px;margin:auto;padding:36px 32px}
+.education-hero{display:grid;grid-template-columns:.85fr 1.15fr;gap:36px;align-items:center}
+.education-copy .eyebrow{font-size:10px;letter-spacing:1.2px;margin-bottom:15px}
+.education-copy h1{font-size:clamp(30px,3.2vw,44px);line-height:1.16;letter-spacing:-1.5px;font-weight:650}
+.education-copy>p{font-size:16px;line-height:1.65;color:#5c6b62;margin:20px 0 24px;max-width:460px}
+.education-visual{min-width:0}.education-visual img{display:block;width:100%;height:auto;border-radius:8px}
+.education-visual figcaption{font-size:11px;line-height:1.5;color:#647368;margin-top:9px}.education-visual figcaption span{color:#69766d}
+.landing-page .button{padding:12px 17px;min-height:46px;border-radius:5px;gap:10px}
+.landing-page .button:hover{transform:none}
+.education-start{border-top:1px solid var(--line);padding-top:28px;padding-bottom:28px}
+.landing-page h2{font-size:25px;letter-spacing:-.6px;font-weight:600}
+.landing-page .start-heading{display:block;margin:0 0 20px}.landing-page .start-heading p{font-size:14px;color:#647368;margin-top:7px}
+.education-start-layout{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;align-items:start;min-width:0}
+.landing-page .start-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.landing-page .start-card{padding:20px;background:#fff;border:1px solid #dfe5db;border-radius:6px;box-shadow:none;transform:none;min-height:0}
+.landing-page .start-card:hover{border-color:#7c9985;background:#f4f7ef;transform:none}
+.landing-page .start-icon{display:block;margin:0 0 10px;background:none;border:0;padding:0;width:auto;height:auto;color:#426b53}
+.landing-page .start-card h3{font-size:17px;letter-spacing:-.3px;margin:0 0 8px}
+.landing-page .start-card p{font-size:13px;line-height:1.55;color:#647368}
+.landing-page .start-card-action{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-top:15px;padding-top:0;border:0}
+.landing-page .start-links{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:16px;padding:0;border:0}
+.landing-page .start-links a,.landing-page .start-links button{display:inline-flex;align-items:center;gap:7px;font-size:12px;border:0;background:none;padding:4px 0;color:#365b43}
+.landing-page .start-links svg{width:16px;height:16px}.landing-page [hidden]{display:none!important}
+.landing-page .start-local-note{margin-top:10px;font-size:11px;color:#6b776e}.landing-page #start-status{font-size:13px;color:#9b3c29}
+.gallery-example{display:block;min-width:0;border:1px solid #dfe5db;border-radius:6px;overflow:hidden;background:white}
+.gallery-example img{display:block;width:100%;height:auto;aspect-ratio:16/8;object-fit:cover}.gallery-example>span{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;font-size:12px}
+.education-how{padding-top:25px;padding-bottom:30px;border-top:1px solid var(--line)}
+.education-intro{display:grid;grid-template-columns:1fr 1.4fr;gap:40px;align-items:center;margin-bottom:26px}
+.education-intro .eyebrow{display:block;font-size:10px;letter-spacing:1.3px;margin-bottom:10px;color:#647368}
+.education-intro>p{font-size:15px;line-height:1.7;color:#5c6b62}
+.education-how .steps{margin-top:20px;gap:28px}.education-how .steps article{border:0;padding:0;position:relative;padding-left:36px}
+.education-how .step-number{position:absolute;left:0;top:0;display:grid;place-items:center;width:25px;height:25px;background:#e8efdf;border-radius:50%;font-size:12px}
+.education-how .steps h3{font-size:16px;letter-spacing:-.2px;margin:2px 0 8px}.education-how .steps p{font-size:13px;line-height:1.55;max-width:none}
+.landing-page .site-footer{max-width:1216px;margin:auto;padding:23px 0;display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px;border-top:1px solid var(--line)}
+.landing-page .site-footer>div:first-child{display:block;margin-left:0;width:auto}.landing-page .site-footer>div:first-child>span{display:block;font-size:11px;margin-top:5px;color:#6b776e}.landing-page .footer-links{margin-left:auto;display:flex;gap:18px;font-size:12px}
+.landing-page .site-footer>small{width:100%;font-size:10px;color:#6b776e}.landing-page .site-footer .producer-credit{padding-top:14px}
+@media(max-width:760px){
+ .education-intro{grid-template-columns:1fr;gap:14px;margin-bottom:24px}
+ .landing-page .site-header{padding:0 20px;height:68px;gap:12px;position:relative}.landing-page .logo{font-size:22px}.landing-page .nav-actions{margin-left:auto}.landing-page .menu-toggle{display:block;border:0;background:none;padding:7px}
+ .landing-page .site-header nav{display:none;position:absolute;top:68px;left:0;right:0;padding:16px 20px;background:#fafbf8;border-bottom:1px solid #dfe5db;z-index:10;margin:0}.landing-page .site-header nav.open{display:flex}
+ .education-hero,.education-start,.education-how{padding:26px 20px}.education-hero{grid-template-columns:1fr;gap:23px}.education-copy h1{font-size:34px}.education-copy>p{margin:14px 0 18px}.education-start-layout{grid-template-columns:1fr;gap:18px}.education-how .steps{grid-template-columns:1fr;gap:20px}.landing-page .site-footer{margin:0 20px;padding:20px 0}.landing-page .footer-links{margin-left:0}
+}
+@media(max-width:430px){.landing-page .start-grid{grid-template-columns:1fr}.landing-page .hero-actions{gap:8px}.landing-page .button{font-size:13px;padding:11px 13px}.education-copy h1{font-size:31px}}
+
+.start-options-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.landing-page .start-options-grid .start-card{display:flex;flex-direction:column;padding:0;overflow:hidden}
+.start-options-grid .start-photo{display:block;width:100%;height:190px;object-fit:cover}
+.start-options-grid .start-card-content{display:flex;flex-direction:column;flex:1;padding:22px}
+.landing-page .start-options-grid .start-card-action{margin-top:auto;padding-top:22px}
+@media(max-width:760px){.start-options-grid{grid-template-columns:1fr}.start-options-grid .start-photo{height:190px}}
+/* Shared rhythm and column grid for the introduction and starting choices. */
+.landing-page .education-how,.landing-page .education-start{padding-top:44px;padding-bottom:40px}
+.landing-page .education-intro{display:block;max-width:800px;margin:0 0 28px}
+.landing-page .education-intro h2,.landing-page .start-heading h2{font-size:30px;line-height:1.25;letter-spacing:-.8px;margin:0}
+.landing-page .education-intro>p{margin-top:14px;font-size:15px;line-height:1.7}
+.landing-page .education-how .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:0}
+.landing-page .education-how .steps article{padding:18px 18px 18px 54px;border:1px solid #dfe5db;border-radius:6px;background:#f3f6ee}
+.landing-page .education-how .step-number{top:18px;left:18px}
+.landing-page .education-how .steps h3{margin:2px 0 9px}
+.landing-page .start-heading{margin-bottom:24px}
+.education-start-layout{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 22px;align-items:stretch}
+.education-start-layout>div,.landing-page .education-start-layout .start-grid{display:contents}
+.landing-page .education-start-layout .start-card{grid-row:1;display:flex;flex-direction:column;min-height:218px;padding:24px}
+.landing-page .education-start-layout .start-card:nth-child(1){grid-column:1}
+.landing-page .education-start-layout .start-card:nth-child(2){grid-column:2}
+.landing-page .education-start-layout .start-card-action{margin-top:auto;padding-top:20px}
+.education-start-layout .gallery-example{grid-column:3;grid-row:1;display:flex;flex-direction:column}
+.education-start-layout .gallery-example img{height:0;min-height:160px;flex:1;aspect-ratio:auto}
+.education-start-layout .gallery-example>span{min-height:48px}
+.landing-page .education-start-layout .start-links{grid-column:1/-1;grid-row:2;margin:0;gap:12px 24px}
+.landing-page .education-start-layout .start-local-note{grid-column:1/-1;grid-row:3;margin:0}
+.education-start-layout #start-status{grid-column:1/-1;margin:0}
+.education-start-layout #start-status:empty{display:none}
+@media(max-width:760px){
+ .landing-page .education-how,.landing-page .education-start{padding:30px 20px}
+ .landing-page .education-intro h2,.landing-page .start-heading h2{font-size:26px}
+ .landing-page .education-how .steps,.education-start-layout{grid-template-columns:1fr;gap:14px}
+ .landing-page .education-start-layout .start-card{min-height:185px}
+ .landing-page .education-start-layout .start-card:nth-child(n),.education-start-layout .gallery-example,.landing-page .education-start-layout .start-links,.landing-page .education-start-layout .start-local-note{grid-column:1;grid-row:auto}
+ .education-start-layout .gallery-example{order:1}
+ .education-start-layout .gallery-example img{height:180px;flex:none}
+ .landing-page .education-start-layout .start-links{order:2;margin-top:4px}
+ .landing-page .education-start-layout .start-local-note{order:3}
+ .education-start-layout #start-status{order:4}
+}

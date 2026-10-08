@@ -1,4 +1,5 @@
-import {cloud, currentUser} from './client.js';
+import {cloud, currentUser, localAccountEnabled} from './client.js';
+import {localRequest} from './local.js';
 import {packAssets, unpackAssets} from './assets.js';
 import {validate} from '../model.js';
 
@@ -10,6 +11,7 @@ export async function requireUser() {
 
 export async function listProjects() {
   await requireUser();
+  if (localAccountEnabled) return localRequest('projects');
   const {data, error} = await cloud.from('projects').select('id,name,updated_at,revision,asset_count,width,depth,object_count').order('updated_at', {ascending: false});
   if (error) throw error;
   return data;
@@ -17,6 +19,7 @@ export async function listProjects() {
 
 export async function loadProject(id) {
   const user = await requireUser();
+  if (localAccountEnabled) { const data=await localRequest(`projects/${encodeURIComponent(id)}`); return {...data,project:validate(data.project)}; }
   const {data, error} = await cloud.from('projects').select('*').eq('id', id).single();
   if (error) throw error;
   const project = await unpackAssets(data.document, user.id, async path => {
@@ -31,6 +34,7 @@ export async function saveProject(project, binding, progress = () => {}) {
   const user = await requireUser();
   if (binding && binding.owner !== user.id) throw Error('Spazio: Questo progetto appartiene a un altro account. Accedi con il proprietario.');
   validate(project);
+  if (localAccountEnabled) return localRequest(`projects/${binding?.id || crypto.randomUUID()}`,'PUT',{project,revision:binding?.revision || 0});
   progress('Caricamento dei contenuti…');
   const {document, assetCount} = await packAssets(project, user.id, async (path, blob) => {
     const stored = await cloud.storage.from('project-assets').exists(path);

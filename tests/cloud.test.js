@@ -12,10 +12,15 @@ test('Cloud assets round-trip, reuse and private ownership', async () => {
   const project=createProject(), image='data:image/png;base64,aGVsbG8=';
   project.objects=[{...item('art'),image},{...item('art'),image}];
   project.reference={src:image,width:12,depth:9};
+  const surface={material:'paint',color:'#ffffff',scale:1,rotation:0,finish:'matte',textureVersion:2,texture:image};
+  project.floorSurface=structuredClone(surface);
+  project.walls[0].surfaces={a:structuredClone(surface),b:structuredClone(surface)};
+  project.objects[0].surface=structuredClone(surface);
   const files=new Map();
   const packed=await packAssets(project,owner,async(path,blob)=>files.set(path,blob));
   assert.equal(files.size,1);assert.equal(packed.assetCount,1);
   assert.equal(project.objects[0].image,image,'Source project remains portable');
+  assert.equal(typeof packed.document.floorSurface.texture,'object','Custom textures are stored as assets, not inline JSON');
   const restored=await unpackAssets(packed.document,owner,async path=>files.get(path));
   assert.deepEqual(restored,project);validate(restored);
   await assert.rejects(unpackAssets(packed.document,'22222222-2222-4222-8222-222222222222',()=>assert.fail('Must reject before downloading')));

@@ -13,7 +13,7 @@ try{
  assert.equal(await page.locator('#stage-title').textContent(),'Allestimento 3D');
  assert.equal(await page.locator('vite-error-overlay').count(),0);
  await page.goto(base+'/studio?start=new');
- await page.locator('[name=name]').fill('Studio misure');await page.locator('#new-form button').click();
+ await page.locator('[name=name]').fill('Studio misure');await page.locator('#new-form button[type=submit]').click();
  async function field(key,value){await page.locator(`[data-field="${key}"]`).fill(String(value));await page.locator(`[data-field="${key}"]`).press('Tab');}
  async function world(x,z){const r=await page.locator('#plan').boundingBox();const scale=Math.min((r.width-110)/12,(r.height-170)/9);return {x:r.x+r.width/2+x*scale,y:r.y+r.height/2+z*scale};}
  await page.locator('[data-tool=measure]').click();
