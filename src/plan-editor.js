@@ -1,3 +1,4 @@
+import {isLocked} from './scene-locks.js';
 import {floorOutline} from './floor-plan.js';
 import {uid,round,item,wallLength,distanceToWall,openingFits} from './model.js';
 import {containsPoint,footprint,measureLength} from './planning.js';
@@ -110,14 +111,14 @@ export function createPlanEditor(canvas,api){
    start=null;draw();return;
   }
   if(tool==='column'){const o=item('column',q.x,q.z);o.h=p.height;apply(p=>p.objects.push(o));api.select(o.id);return;}
-  const nearest=p.walls.map(w=>({w,...distanceToWall(raw.x,raw.z,w)})).sort((a,b)=>a.distance-b.distance)[0];
+  const nearest=p.walls.filter(w=>!isLocked(p,w.id)).map(w=>({w,...distanceToWall(raw.x,raw.z,w)})).sort((a,b)=>a.distance-b.distance)[0];
   if(['door','window','opening'].includes(tool)){
    if(!nearest||nearest.distance>.4){api.notify('Tocca una parete per inserire l’apertura.');return;}
    const w=nearest.w,o={id:uid(),type:tool,width:tool==='door'?.9:1.2,height:tool==='window'?1.2:2.1,sill:tool==='window'?1:0,offset:round(Math.max(0,nearest.offset-(tool==='door'?.45:.6)))};
    if(!openingFits(w,o)){api.notify('L’apertura non entra o si sovrappone a un’altra.');return;}apply(()=>w.openings.push(o));api.select(o.id);return;
   }
-  const opening=nearest?.distance<.3?nearest.w.openings.find(o=>nearest.offset>=o.offset&&nearest.offset<=o.offset+o.width):null;if(opening){api.select(opening.id);return;}
-  const obj=[...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).reverse().find(o=>containsPoint(o,raw.x,raw.z,3/scale));api.select(obj?.id||(nearest?.distance<.3?nearest.w.id:p.reference&&Math.abs(raw.x)<=p.reference.width/2&&Math.abs(raw.z)<=p.reference.depth/2?'reference:plan':null),undefined,e.shiftKey);
+  const opening=nearest?.distance<.3?nearest.w.openings.find(o=>nearest.offset>=o.offset&&nearest.offset<=o.offset+o.width):null;if(opening&&!isLocked(p,opening.id)){api.select(opening.id);return;}
+  const obj=[...p.objects].sort((a,b)=>(a.type==='floor-area'?0:1)-(b.type==='floor-area'?0:1)).reverse().find(o=>!isLocked(p,o.id)&&containsPoint(o,raw.x,raw.z,3/scale));api.select(obj?.id||(nearest?.distance<.3?nearest.w.id:p.reference&&!isLocked(p,'reference:plan')&&Math.abs(raw.x)<=p.reference.width/2&&Math.abs(raw.z)<=p.reference.depth/2?'reference:plan':null),undefined,e.shiftKey);
   if(obj&&!e.shiftKey&&!api.multiple?.()&&(!api.transform||api.transform()==='move')){drag={id:obj.id,origin:{x:obj.x,z:obj.z},pointer:raw,screen:{x:e.clientX,y:e.clientY},moved:false};canvas.setPointerCapture(e.pointerId);}
  });
  canvas.addEventListener('pointermove',e=>{

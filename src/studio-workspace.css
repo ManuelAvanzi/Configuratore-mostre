@@ -159,3 +159,14 @@
 #reference-controls>button{margin-bottom:10px;font-size:12px;padding:7px}.reference-size-actions{display:flex;gap:8px;margin:16px 0}.reference-size-actions button{flex:1;padding:9px 6px;font-size:12px}
 
 #reference-options>button{width:100%;margin-bottom:8px;padding:8px;font-size:12px}#reference-grid{margin-bottom:10px;font-size:12px;padding:5px}#calibration-hint p{font-size:13px;margin-bottom:10px}
+
+/* Keep the scene list accessible while tools and catalog scroll independently. */
+#left.scene-library{overflow:hidden!important}
+#left.scene-library .catalog-pane{min-height:0;flex:1 1 55%}
+#left.scene-library .architecture-pane{display:block;overflow-y:auto}
+#left.scene-library .list-section{flex:0 0 40%;min-height:160px}
+#left .object-lock{flex-shrink:0;padding:6px;background:transparent;border-color:transparent}
+#left .object-lock svg{width:16px;height:16px}
+#left .object-lock[aria-pressed=true]{color:#865713;background:#f4e8cf;border-color:#d8bd86}
+#left .is-locked .list-item{opacity:.7}
+#scene canvas{cursor:default}
