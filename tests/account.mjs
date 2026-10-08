@@ -81,7 +81,7 @@ async function context() {
 }
 async function login(page,email) {
   await page.goto(origin+'/account');
-  await page.getByLabel('Email',{exact:true}).fill(email);
+  await page.getByLabel('Email o nome utente',{exact:true}).fill(email);
   await page.getByLabel('Password',{exact:true}).fill('valid-password-123');
   await page.locator('#auth-form button').click();
   await expect(page.locator('h1')).toHaveText('I miei progetti');
@@ -95,7 +95,7 @@ try {
   await page.screenshot({path:'test-results/account-unconfigured.png',fullPage:true});
   await page.goto(origin+'/');await page.locator('.nav-actions [data-access]').click();
   await expect(page.locator('#auth-form')).toBeVisible();
-  await page.getByLabel('Email',{exact:true}).fill('alice@example.test');
+  await page.getByLabel('Email o nome utente',{exact:true}).fill('alice@example.test');
   await page.getByLabel('Password',{exact:true}).fill('wrong-password');
   await page.locator('#auth-form button').click();await expect(page.locator('#account-status')).toContainText('non corretti');
   await page.locator('[data-mode=signup]').click();

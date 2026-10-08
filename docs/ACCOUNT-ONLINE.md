@@ -2,7 +2,9 @@
 
 ## Stato
 
-L'integrazione è implementata ma non collegata a un progetto Supabase reale. Senza configurazione l'app mostra “Area online in preparazione”, non raccoglie credenziali e continua a funzionare in locale.
+Dal 8 ottobre 2026 il sito Vercel è collegato al progetto Supabase ExhibitionLab (regione Irlanda, piano Free). Schema e bucket privato sono configurati. L’account redazione usa un alias di accesso associato a un identificatore email interno non recapitabile; non è previsto il recupero tramite email per questo account. Le credenziali non sono incorporate nella build.
+
+La configurazione pubblica è nelle variabili Vercel VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY. Nessuna chiave amministrativa è distribuita al browser. L’archivio locale resta separato: per trasferire un progetto esistente, esportarlo e aprirlo sul sito prima di salvarlo nell’account.
 
 Sono disponibili: registrazione email/password, conferma email, accesso, recupero password, uscita dalla sessione corrente, pagina I miei progetti con ricerca, salvataggio online esplicito, riapertura e salvataggio come nuovo progetto. Immagini, planimetrie, video e GLB dei progetti sono inclusi. I modelli e materiali del catalogo restano asset comuni dell'app, senza duplicarli per utente.
 
