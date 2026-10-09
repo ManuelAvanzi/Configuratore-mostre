@@ -1,5 +1,7 @@
 # Spazio — Studio espositivo
 
+Per iniziare a collaborare: [accesso, installazione e verifiche](CONTRIBUTING.md).
+
 Applicazione web autonoma e locale per creare uno spazio, allestire una mostra e visitarla in scala reale. Codice, dipendenze, caratteri, documentazione e build sono contenuti in questa cartella. Nessun progetto preesistente è stato modificato; la cartella codex non conteneva MetaReality.
 
 ## Installazione dalla repository
