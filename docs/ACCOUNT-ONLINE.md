@@ -1,3 +1,5 @@
+> DOCUMENTO STORICO: il servizio descritto è stato disattivato nel frontend. Vedere [Persistenza](PERSISTENZA.md).
+
 # Account e progetti online
 
 ## Stato

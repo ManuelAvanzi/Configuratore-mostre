@@ -1,13 +1,7 @@
 import {localClient} from './local.js';
-import {createClient} from '@supabase/supabase-js';
-
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-export const localAccountEnabled = !url && !key && ['localhost','127.0.0.1','[::1]'].includes(location.hostname);
-export const cloudEnabled = Boolean(url && key) || localAccountEnabled;
-export const cloud = localAccountEnabled ? localClient : url && key ? createClient(url, key, {
-  auth: {persistSession: true, autoRefreshToken: true, detectSessionInUrl: true},
-}) : null;
+export const localAccountEnabled = ['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+export const cloudEnabled=localAccountEnabled;
+export const cloud=localAccountEnabled?localClient:null;
 
 export async function currentUser() {
   if (!cloud) return null;

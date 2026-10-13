@@ -1,6 +1,6 @@
 # Archivio locale
 
-In assenza della configurazione Supabase, su localhost l'app usa l'account locale
+Su localhost l'app usa l'account locale
 `redazione`. L'installazione corrente conserva la password come hash scrypt in
 `.local-data/account.json`, escluso da Git e dall'accesso HTTP di Vite.
 
@@ -11,8 +11,7 @@ la cartella non fa parte della build e non va pubblicata. Il limite per progetto
 accesso perché le sessioni rimangono solo in memoria.
 
 L'API è disponibile con `npm run dev` e `npm run preview`, solo tramite un host
-loopback. Una pubblicazione statica di `dist` non include questo archivio. Per un
-archivio condiviso online resta disponibile l'integrazione Supabase esistente.
+loopback. Una pubblicazione statica di `dist` non include questo archivio. L’archivio condiviso online non è incluso.
 
 Verifica dell'installazione corrente: `node tests/local-account.mjs`.
 Il test crea e rimuove soltanto un proprio progetto di prova.

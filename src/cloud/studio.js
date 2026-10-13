@@ -3,6 +3,9 @@ import {loadProject, saveProject} from './projects.js';
 import {validate} from '../model.js';
 
 export function mountCloud({getProject, saveLocal, replaceProject, readDraft, cacheCloud, notify}) {
+  if(!cloudEnabled)return {draftState:()=>null,changed(){},detach(){},async open(){
+    const dialog=document.createElement('dialog');dialog.innerHTML='<h2>Archivio online disattivato</h2><p>Questo collegamento richiedeva il servizio online. Puoi riprendere il progetto sul dispositivo oppure importare un file esportato.</p><a href="/studio?start=resume">Apri lo studio locale →</a>';document.body.append(dialog);dialog.addEventListener('cancel',e=>e.preventDefault());dialog.showModal();return false;
+  }};
   let binding = null, savedRevision = -1, changes = 0, busy = false, locked = false, cloudProjectLocalId = null;
   const button = document.createElement('button');
   button.id = 'cloud-save'; button.textContent = 'Salva nel mio account';
